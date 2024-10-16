@@ -64,7 +64,7 @@ public class UserEntity implements UserDetails {
     private List<CommentEntity> comments;
     @OneToMany(mappedBy = "user")
     private List<LikeEntiy> likes;
-
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FriendEntity> friends;
 
     @OneToMany(mappedBy = "user")

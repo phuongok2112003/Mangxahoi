@@ -84,7 +84,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         DecodedJWT decodedJWT = verifier.verify(token);
 
         String email = decodedJWT.getSubject();
-        int userId = decodedJWT.getClaim("id").asInt();
+        Long userId = decodedJWT.getClaim("id").asLong();
         UserEntity user = new UserEntity();
         user.setId(userId);
         user.setEmail(email);
