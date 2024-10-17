@@ -20,10 +20,10 @@ public class ImageEntity {
     private String url;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id",referencedColumnName = "id")
     private PostEntity post;
 }

@@ -25,8 +25,6 @@ public class CustomAuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
         UserEntity user = (UserEntity) authentication.getPrincipal();
 
-        userService.permanentLock(user.getUsername());
-
         String accessToken = EbsTokenUtils.createAccessToken(user);
         String refreshToken = EbsTokenUtils.createRefreshToken(user.getUsername());
 

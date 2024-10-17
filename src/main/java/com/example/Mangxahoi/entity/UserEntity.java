@@ -3,10 +3,7 @@ package com.example.Mangxahoi.entity;
 
 import com.example.Mangxahoi.constans.enums.UserRole;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,15 +12,13 @@ import java.util.*;
 
 @Entity
 @Table(name = "users")
-@Setter
-@Getter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Builder
 public class UserEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long  id;
 
     @Column(name = "username", nullable = false, length = 100)
@@ -36,23 +31,19 @@ public class UserEntity implements UserDetails {
     private String password;
 
     @Column(name = "role", nullable = false)
-
     private String role ;
 
-    @Column(name = "verify_token", length = 191)
-    private String verifyToken;
+    @Column(name = "gender", nullable = false)
+    private Boolean gender ;
 
     @Column(name = "is_active", nullable = false)
     private boolean isActive=true ;
 
-    @Column(name = "forgot_token", length = 512)
-    private String forgotToken;
-
-    @Column(name = "forgot_token_expire")
-    private Date forgotTokenExpire;
-
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
+
+    @Column(name = "dateBirth", nullable = false)
+    private  Date dateBirth;
 
     @Column(name = "updated_at")
     private Date updatedAt;
@@ -63,19 +54,19 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<CommentEntity> comments;
     @OneToMany(mappedBy = "user")
-    private List<LikeEntiy> likes;
+    private List<LikeEntity> likes;
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FriendEntity> friends;
 
     @OneToMany(mappedBy = "user")
     private List<ImageEntity> images;
 
-    public UserRole getPermission() {
+    public UserRole getRole() {
         return UserRole.parseByCode(role);
     }
 
-    public void setPermission(UserRole permission) {
-        this.role = permission.toString();
+    public void setRole(UserRole role) {
+        this.role = role.toString();
     }
 
     @Override
@@ -111,10 +102,7 @@ public class UserEntity implements UserDetails {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", permission='" + role + '\'' +
-                ", verifyToken='" + verifyToken + '\'' +
                 ", isActive=" + isActive +
-                ", forgotToken='" + forgotToken + '\'' +
-                ", forgotTokenExpire=" + forgotTokenExpire +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", posts=" + posts +

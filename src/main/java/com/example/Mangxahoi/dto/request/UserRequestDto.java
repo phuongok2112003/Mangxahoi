@@ -2,6 +2,7 @@ package com.example.Mangxahoi.dto.request;
 
 import com.example.Mangxahoi.constans.enums.UserRole;
 
+import com.example.Mangxahoi.entity.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,17 +16,18 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserRequestDto {
-    private int id;
     private String username;
     private String email;
     private String password;
     private UserRole role ;
-    private String verifyToken;
-    private boolean isActive ;
-    private String forgotToken;
-    private Date forgotTokenExpire;
+    private Boolean gender ;
+    private boolean isActive=true ;
     private Date createdAt;
+    private  Date dateBirth;
     private Date updatedAt;
-    private List<PostRequestDto> posts;
-    private List<CommentRequestDto> comments;
+    private List<PostEntity> posts;
+    private List<CommentEntity> comments;
+    private List<LikeEntity> likes;
+    private List<FriendEntity> friends;
+    private List<ImageEntity> images;
 }

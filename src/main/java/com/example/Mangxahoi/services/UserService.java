@@ -13,20 +13,7 @@ import org.springframework.data.domain.Page;
 
 
 public interface UserService {
-
-    UserResponseDto getUserDtoByUsername(String username);
-
-    UserEntity getUserByUsername(String username);
-
-    UserResponseDto getInfo();
-    Boolean logout(HttpServletRequest request);
-    UserResponseDto save(UserRequestDto dto);
-    UserResponseDto update(@NonNull int id, UserRequestDto dto);
-    Boolean delete(int id);
-    boolean permanentLock(String username);
-
-
-   String sendPasswordResetCode(String email);
-   Boolean verifyPasswordResetCode(PasswordResetRequest passwordResetRequest);
-    TokenDto refreshToken(String refreshToken);
+    UserResponseDto register(UserRequestDto dto);
+    UserResponseDto update(@NonNull Long id, UserRequestDto dto);
+    String delete(Long id);
 }

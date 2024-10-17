@@ -1,7 +1,4 @@
 package com.example.Mangxahoi.entity;
-
-
-import com.example.Mangxahoi.constans.enums.Comentstatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -25,11 +22,11 @@ public class CommentEntity {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id",referencedColumnName = "id")
     private PostEntity post;
 
 }

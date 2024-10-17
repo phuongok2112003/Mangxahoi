@@ -11,18 +11,18 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-@Table(name = "like")
-public class LikeEntiy {
+@Table(name = "favorite")
+public class LikeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserEntity user;
 
     @ManyToOne
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id",referencedColumnName = "id")
     private PostEntity post;
 
 }

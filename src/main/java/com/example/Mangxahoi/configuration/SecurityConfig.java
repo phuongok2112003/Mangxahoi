@@ -5,12 +5,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -42,36 +45,46 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JwtTokenBlacklist tokenBlacklist;
     private final UserService userService;
 
     private static final String[] PUBLIC_URLS = {
-            "/api/**",
+            "/user/forgot",
+            "/user",
+            "/swagger-ui.html",
+            "/login/**",
+            "/webjars/**",
+            "/swagger-resources/**",
             "/v2/api-docs",
             "/configuration/ui",
-            "/swagger-resources/**",
-            "/swagger-ui.html",
-            "/webjars/**"
+            "/api/**","/api/v1/auth/**", "/v2/api-docs", "/v3/api-docs",
+            "/v3/api-docs/**", "/swagger-resources", "/swagger-resources/**", "/configuration/ui",
+            "/configuration/security", "/swagger-ui/**", "/webjars/**", "/swagger-ui.html", "/api/auth/**"
+            , "/authenticate"
     };
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf(csrf -> csrf.disable())
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
+
+        http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(PUBLIC_URLS).permitAll()
+                        .requestMatchers(HttpMethod.POST,PUBLIC_URLS).permitAll()
+                        .requestMatchers(HttpMethod.GET,PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated());
 
         // Đăng nhập qua CustomAuthenticationFilter
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager(null));
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager);
         customAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessHandler(userService));
         customAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler(userService));
         customAuthenticationFilter.setFilterProcessesUrl("/api/login");
 
+        // Thêm CustomAuthenticationFilter và CustomAuthorizationFilter
         http.addFilter(customAuthenticationFilter);
-        http.addFilterBefore(new CustomAuthorizationFilter(tokenBlacklist), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+
 
         return http.build();
+
     }
 
     @Bean

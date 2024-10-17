@@ -18,10 +18,10 @@ public class FriendEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserEntity user;
-
-    @ManyToOne
-    @JoinColumn(name = "friend_id")
-    private FriendEntity friend;
+//
+//    @ManyToOne
+//    @JoinColumn(name = "id",referencedColumnName = "friend_id")
+//    private FriendEntity friend;
 }

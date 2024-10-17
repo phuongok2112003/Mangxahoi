@@ -8,10 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
-import java.awt.*;
-import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -27,14 +24,14 @@ public class PostEntity {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id",referencedColumnName = "id")
     private UserEntity user;
 
     @OneToMany(mappedBy = "post")
     private List<CommentEntity> comments;
 
     @OneToMany(mappedBy = "post")
-    private List<LikeEntiy> likes;
+    private List<LikeEntity> likes;
 
     @OneToMany(mappedBy = "post")
     private List<ImageEntity> images;

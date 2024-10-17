@@ -37,8 +37,6 @@ public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationF
             return;
         }
 
-        String username = loginRequest.getUsername();
-        UserEntity user = userService.getUserByUsername(username);
 
         response.getWriter().write(EbsConvertUtils.toString(DataError.build(CommonStatus.WRONG_USERNAME_OR_PASSWORD)));
 

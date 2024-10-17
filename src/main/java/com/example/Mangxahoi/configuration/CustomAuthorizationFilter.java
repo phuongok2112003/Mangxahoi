@@ -30,11 +30,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
-    private final JwtTokenBlacklist tokenBlacklist;
 
-    public CustomAuthorizationFilter(JwtTokenBlacklist tokenBlacklist) {
-        this.tokenBlacklist = tokenBlacklist;
-    }
+
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -50,10 +47,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         }
 
         String token = authorizationHeader.substring("Bearer ".length());
-        if (tokenBlacklist.isBlacklisted(token)) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
+
 
         try {
             processJwtAuthentication(token);

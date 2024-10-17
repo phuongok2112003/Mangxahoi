@@ -5,31 +5,24 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
-import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.List;
 
 
 @Configuration
-@EnableWebMvc
-public class SwaggerConfig implements WebMvcConfigurer {
+public class SwaggerConfig{
 
     @Bean
-    public OpenAPI openApi() {
+    public OpenAPI customOpenAPI() {
+
         return new OpenAPI()
-                .info(new Info().title("Mang xa hoi").version("version").description("description"))
-                .servers(List.of(new Server().url("http://localhost:8080").description("serverName")))
-                .components(new Components().addSecuritySchemes("bearerAuth", new SecurityScheme()
-                        .type(SecurityScheme.Type.HTTP)
-                        .scheme("bearer")
-                        .bearerFormat("JWT")))
-                .security(List.of(new SecurityRequirement().addList("bearerAuth")));
+                .info(new Info().title("JavaInUse Authentication Service"))
+                .addSecurityItem(new SecurityRequirement().addList("JavaInUseSecurityScheme"))
+                .components(new Components().addSecuritySchemes("JavaInUseSecurityScheme", new SecurityScheme()
+                        .name("JavaInUseSecurityScheme").type(SecurityScheme.Type.HTTP).scheme("bearer").bearerFormat("JWT")));
+
     }
 
     @Bean
