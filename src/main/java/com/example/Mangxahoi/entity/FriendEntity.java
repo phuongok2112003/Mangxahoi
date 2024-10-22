@@ -17,11 +17,13 @@ public class FriendEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String status;
+
     @ManyToOne
-    @JoinColumn(name = "user_id",referencedColumnName = "id")
-    private UserEntity user;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "id",referencedColumnName = "friend_id")
-//    private FriendEntity friend;
+    @JoinColumn(name = "sender_id")
+    private UserEntity sender;
+
+    @ManyToOne
+    @JoinColumn(name = "receiver_id")
+    private UserEntity receiver;
 }

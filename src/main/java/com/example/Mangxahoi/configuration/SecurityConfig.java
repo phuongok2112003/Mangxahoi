@@ -1,5 +1,6 @@
 package com.example.Mangxahoi.configuration;
 
+import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -46,20 +47,14 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserService userService;
-
+    private final UserRepository userRepository;
     private static final String[] PUBLIC_URLS = {
-            "/user/forgot",
-            "/user",
+            "/v3/api-docs/**",
+            "/swagger-ui/**",
             "/swagger-ui.html",
-            "/login/**",
-            "/webjars/**",
-            "/swagger-resources/**",
-            "/v2/api-docs",
-            "/configuration/ui",
-            "/api/**","/api/v1/auth/**", "/v2/api-docs", "/v3/api-docs",
-            "/v3/api-docs/**", "/swagger-resources", "/swagger-resources/**", "/configuration/ui",
-            "/configuration/security", "/swagger-ui/**", "/webjars/**", "/swagger-ui.html", "/api/auth/**"
-            , "/authenticate"
+            "/api/auth/**",
+            "/authenticate",
+            "/user/**"
     };
 
     @Bean
@@ -74,8 +69,8 @@ public class SecurityConfig {
 
         // Đăng nhập qua CustomAuthenticationFilter
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager);
-        customAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessHandler(userService));
-        customAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler(userService));
+        customAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessHandler(userRepository));
+        customAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler(userRepository));
         customAuthenticationFilter.setFilterProcessesUrl("/api/login");
 
         // Thêm CustomAuthenticationFilter và CustomAuthorizationFilter

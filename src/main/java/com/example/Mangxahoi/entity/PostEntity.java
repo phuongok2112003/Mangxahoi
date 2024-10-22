@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -35,4 +36,9 @@ public class PostEntity {
 
     @OneToMany(mappedBy = "post")
     private List<ImageEntity> images;
+
+    @Column(name = "created_at", nullable = false)
+    private Date createdAt;
+    @Column(name = "updated_at")
+    private Date updatedAt;
 }

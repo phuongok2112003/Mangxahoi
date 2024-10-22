@@ -14,7 +14,7 @@ public enum UserStatus implements ErrorStatus {
     EMAIL_IS_EMPTY(400, "errors.email_is_empty"),
     PASSWORD_IS_EMPTY(400, "errors.password_is_empty"),
     EMAIL_NOT_FOUND(400, "errors.email_not_found"),
-    USERNAME_HAD_TEST(400,"errors.user_had_test"),
+  WRONG_OTP(400,"errors.user_wrong_otp"),
     ;
 
     private final int code;

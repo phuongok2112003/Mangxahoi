@@ -1,6 +1,10 @@
 package com.example.Mangxahoi.controller;
 
+import com.example.Mangxahoi.dto.Otp;
+import com.example.Mangxahoi.dto.TokenDto;
+import com.example.Mangxahoi.dto.request.PasswordResetRequest;
 import com.example.Mangxahoi.dto.request.UserRequestDto;
+import com.example.Mangxahoi.dto.response.EmailResponse;
 import com.example.Mangxahoi.dto.response.UserResponseDto;
 import com.example.Mangxahoi.services.UserService;
 import com.example.Mangxahoi.utils.EOResponse;
@@ -33,4 +37,27 @@ public class UserController {
 
         return  EOResponse.build(userService.update(id,userDto));
     }
+
+    @PostMapping("/get-token")
+    public EOResponse<TokenDto> getToken(@RequestBody Otp otp){
+        return EOResponse.build(userService.getToken(otp));
+    }
+    @PostMapping("/refresh-token")
+    public TokenDto refreshToken(@RequestParam("token") String token) {
+        return userService.refreshToken(token);
+    }
+
+    @PostMapping("/forgot")
+    public EOResponse<EmailResponse> forgotPassword(@RequestParam String email) {
+        return EOResponse.build(userService.sendPasswordResetCode(email));
+    }
+    @PostMapping("/reset-password")
+    public EOResponse<String> forgotPassword(@RequestParam("token") String token,@RequestBody PasswordResetRequest request) {
+        return   EOResponse.build(userService.verifyPasswordResetCode(token,request));
+    }
+    @GetMapping("/reset-password")
+    public EOResponse<String> getForgotPassword(@RequestParam("token") String token) {
+        return   EOResponse.build(token);
+    }
+
 }

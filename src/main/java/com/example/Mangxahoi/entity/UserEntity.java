@@ -41,12 +41,15 @@ public class UserEntity implements UserDetails {
 
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
+    @Column(name = "updated_at")
+    private Date updatedAt;
+    @Column(name = "otp")
+    private String otp;
 
     @Column(name = "dateBirth", nullable = false)
     private  Date dateBirth;
 
-    @Column(name = "updated_at")
-    private Date updatedAt;
+
 
     @OneToMany(mappedBy = "user")
     private List<PostEntity> posts;
@@ -66,7 +69,7 @@ public class UserEntity implements UserDetails {
     }
 
     public void setRole(UserRole role) {
-        this.role = role.toString();
+        this.role = role.getCode();
     }
 
     @Override

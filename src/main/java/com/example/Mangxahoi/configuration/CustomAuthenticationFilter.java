@@ -27,7 +27,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             LoginRequest loginRequest = objectMapper.readValue(request.getInputStream(), LoginRequest.class);
-            loginRequestThreadLocal.set(loginRequest); // Store loginRequest in thread-local variable
+            loginRequestThreadLocal.set(loginRequest);
 
             String username = loginRequest.getUsername();
             String password = loginRequest.getPassword();

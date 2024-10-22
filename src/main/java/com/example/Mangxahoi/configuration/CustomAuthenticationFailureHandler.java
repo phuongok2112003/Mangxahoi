@@ -6,6 +6,7 @@ import com.example.Mangxahoi.dto.request.LoginRequest;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.error.DataError;
+import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.UserService;
 import com.example.Mangxahoi.utils.EbsConvertUtils;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,10 +21,10 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import java.io.IOException;
 
 public class CustomAuthenticationFailureHandler extends SimpleUrlAuthenticationFailureHandler {
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    public CustomAuthenticationFailureHandler(UserService userService) {
-        this.userService = userService;
+    public CustomAuthenticationFailureHandler(UserRepository userService) {
+        this.userRepository = userService;
     }
 
     @Override

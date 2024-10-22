@@ -2,7 +2,9 @@ package com.example.Mangxahoi.constans.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 
@@ -16,9 +18,12 @@ public enum UserRole implements GrantedAuthority {
 
 
     private String name;
-
+    @JsonValue
+    public String getCode() {
+        return name;
+    }
     @JsonCreator
-    public static UserRole parseByCode(@JsonProperty("name") String name) {
+    public static UserRole parseByCode(String name) {
         if (name == null) {
             return null;
         }

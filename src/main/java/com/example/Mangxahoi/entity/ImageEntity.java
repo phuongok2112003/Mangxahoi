@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -26,4 +28,9 @@ public class ImageEntity {
     @ManyToOne
     @JoinColumn(name = "post_id",referencedColumnName = "id")
     private PostEntity post;
+
+    @Column(name = "created_at", nullable = false)
+    private Date createdAt;
+    @Column(name = "updated_at")
+    private Date updatedAt;
 }
