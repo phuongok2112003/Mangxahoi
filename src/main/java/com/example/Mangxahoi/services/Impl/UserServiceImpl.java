@@ -228,7 +228,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userEntity.setPosts(userRequestDto.getPosts());
         userEntity.setComments(userRequestDto.getComments());
         userEntity.setLikes(userRequestDto.getLikes());
-        userEntity.setFriends(userRequestDto.getFriends());
+
         userEntity.setImages(userRequestDto.getImages());
 
     }

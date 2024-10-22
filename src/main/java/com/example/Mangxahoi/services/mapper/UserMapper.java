@@ -25,7 +25,6 @@ public class UserMapper {
         dto.setPosts(entity.getPosts());
         dto.setComments(entity.getComments());
         dto.setLikes(entity.getLikes());
-        dto.setFriends(entity.getFriends());
         dto.setImages(entity.getImages());
         return dto;
     }
