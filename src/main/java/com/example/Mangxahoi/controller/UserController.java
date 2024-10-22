@@ -3,7 +3,7 @@ package com.example.Mangxahoi.controller;
 import com.example.Mangxahoi.dto.Otp;
 import com.example.Mangxahoi.dto.TokenDto;
 import com.example.Mangxahoi.dto.request.PasswordResetRequest;
-import com.example.Mangxahoi.dto.request.UserRequestDto;
+import com.example.Mangxahoi.dto.request.UserRequest;
 import com.example.Mangxahoi.dto.response.EmailResponse;
 import com.example.Mangxahoi.dto.response.UserResponseDto;
 import com.example.Mangxahoi.services.UserService;
@@ -22,7 +22,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public  EOResponse<UserResponseDto>  save(@RequestBody UserRequestDto userDto) {
+    public  EOResponse<UserResponseDto>  save(@RequestBody UserRequest userDto) {
         return  EOResponse.build(userService.register(userDto));
     }
 
@@ -33,7 +33,7 @@ public class UserController {
 
     @PreAuthorize("hasAuthority('admin')")
     @PutMapping("/{id}")
-    public  EOResponse<UserResponseDto>  update(@PathVariable long id,@RequestBody @NonNull UserRequestDto userDto) {
+    public  EOResponse<UserResponseDto>  update(@PathVariable long id,@RequestBody @NonNull UserRequest userDto) {
 
         return  EOResponse.build(userService.update(id,userDto));
     }

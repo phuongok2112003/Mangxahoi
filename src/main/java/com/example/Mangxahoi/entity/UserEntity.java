@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Entity
@@ -47,7 +48,7 @@ public class UserEntity implements UserDetails {
     private String otp;
 
     @Column(name = "dateBirth", nullable = false)
-    private  Date dateBirth;
+    private LocalDate dateBirth;
 
 
 
@@ -57,7 +58,7 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<CommentEntity> comments;
     @OneToMany(mappedBy = "user")
-    private List<LikeEntity> likes;
+    private List<FavoriteEntity> likes;
     @OneToMany(mappedBy = "user")
     private List<ImageEntity> images;
 

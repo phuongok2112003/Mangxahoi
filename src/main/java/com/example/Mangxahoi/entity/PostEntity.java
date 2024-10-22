@@ -32,7 +32,7 @@ public class PostEntity {
     private List<CommentEntity> comments;
 
     @OneToMany(mappedBy = "post")
-    private List<LikeEntity> likes;
+    private List<FavoriteEntity> likes;
 
     @OneToMany(mappedBy = "post")
     private List<ImageEntity> images;

@@ -7,11 +7,11 @@ import java.util.Date;
 
 @Setter
 @Getter
-public class CommentRequestDto {
+public class CommentRequest {
     private int id;
-    private UserRequestDto user;
+    private UserRequest user;
     private String comment;
-    private PostRequestDto post;
+    private PostRequest post;
     private String status = "unseen";
     private Date createdAt;
     private Date updatedAt;

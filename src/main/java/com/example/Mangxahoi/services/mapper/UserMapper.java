@@ -1,9 +1,7 @@
 package com.example.Mangxahoi.services.mapper;
 
-import com.example.Mangxahoi.dto.request.UserRequestDto;
 import com.example.Mangxahoi.dto.response.UserResponseDto;
 import com.example.Mangxahoi.entity.UserEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class UserMapper {
 
@@ -22,10 +20,7 @@ public class UserMapper {
         dto.setDateBirth(entity.getDateBirth());
         dto.setUpdatedAt(entity.getUpdatedAt());
 
-        dto.setPosts(entity.getPosts());
-        dto.setComments(entity.getComments());
-        dto.setLikes(entity.getLikes());
-        dto.setImages(entity.getImages());
+
         return dto;
     }
 
