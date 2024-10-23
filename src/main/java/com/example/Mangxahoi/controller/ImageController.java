@@ -21,7 +21,7 @@ import java.util.List;
 public class ImageController {
     private final ImageService imageService;
     @PostMapping(value = "/upload-image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public EOResponse<List<ImageResponse>> uploadImage(@RequestParam("files") MultipartFile[] files) {
+    public EOResponse<List<ImageResponse>> uploadImage(@RequestPart("files") MultipartFile[] files) {
 
         return EOResponse.build(imageService.uploadImage(files));
     }
