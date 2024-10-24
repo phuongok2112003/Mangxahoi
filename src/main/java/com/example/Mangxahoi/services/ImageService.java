@@ -11,4 +11,5 @@ public interface ImageService {
     byte[] getImage( String filename);
     String deleteImage(String filename);
     List<ImageResponse> updateImage(ImageRequest imageCurr, MultipartFile[]  image);
+    ImageResponse uploadAvatar(MultipartFile files);
 }

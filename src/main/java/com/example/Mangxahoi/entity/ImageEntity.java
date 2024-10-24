@@ -1,11 +1,9 @@
 package com.example.Mangxahoi.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -14,6 +12,7 @@ import java.util.Date;
 @Getter
 @Setter
 @Table(name = "image")
+@Builder
 public class ImageEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,15 +21,11 @@ public class ImageEntity {
     private String url;
 
     @ManyToOne
-    @JoinColumn(name = "user_id",referencedColumnName = "id")
-    private UserEntity user;
-
-    @ManyToOne
     @JoinColumn(name = "post_id",referencedColumnName = "id")
     private PostEntity post;
 
     @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    private Instant createdAt;
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private Instant updatedAt;
 }

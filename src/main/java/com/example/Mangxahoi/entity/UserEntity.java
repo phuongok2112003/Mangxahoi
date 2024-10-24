@@ -8,6 +8,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -40,17 +41,29 @@ public class UserEntity implements UserDetails {
     @Column(name = "is_active", nullable = false)
     private boolean isActive=true ;
 
+    @Column(name = "avatar_url", nullable = false)
+    private String avatarUrl;
+
+    @Column(name = "occupation", nullable = false)
+    private String occupation;//nghe nghiep
+
+    @Column(name = "location", nullable = false)
+    private String location;
+
+    @Column(name = "about_me", nullable = false)
+    private String aboutMe;
+
     @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    private Instant createdAt;
+
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private Instant updatedAt;
+
     @Column(name = "otp")
     private String otp;
 
     @Column(name = "dateBirth", nullable = false)
     private LocalDate dateBirth;
-
-
 
     @OneToMany(mappedBy = "user")
     private List<PostEntity> posts;
@@ -59,8 +72,6 @@ public class UserEntity implements UserDetails {
     private List<CommentEntity> comments;
     @OneToMany(mappedBy = "user")
     private List<FavoriteEntity> likes;
-    @OneToMany(mappedBy = "user")
-    private List<ImageEntity> images;
 
     public UserRole getRole() {
         return UserRole.parseByCode(role);
@@ -95,19 +106,5 @@ public class UserEntity implements UserDetails {
         return isActive;
     }
 
-    @Override
-    public String toString() {
-        return "UserEntity{" +
-                "id=" + id +
-                ", username='" + username + '\'' +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", permission='" + role + '\'' +
-                ", isActive=" + isActive +
-                ", createdAt=" + createdAt +
-                ", updatedAt=" + updatedAt +
-                ", posts=" + posts +
-                ", comments=" + comments +
-                '}';
-    }
+
 }

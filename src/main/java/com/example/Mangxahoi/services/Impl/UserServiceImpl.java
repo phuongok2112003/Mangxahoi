@@ -31,6 +31,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -40,6 +41,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.time.Instant;
 import java.util.Date;
 
 
@@ -70,7 +72,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         user = userRepository.save(user);
         return entityToDto(user);
     }
-
+    @PostAuthorize("returnObject.username == authentication.name")
     @Override
     public UserResponseDto update(@NonNull Long id, UserRequest dto) {
         UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
@@ -80,7 +82,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
         dtoToEntiy(dto,entity);
         entity.setActive(dto.isActive());
-        entity.setUpdatedAt(new Date());
+        entity.setUpdatedAt(Instant.now());
         userRepository.save(entity);
         return entityToDto(entity);
     }
@@ -219,9 +221,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userEntity.setRole(userRequestDto.getRole());
         userEntity.setGender(userRequestDto.getGender());
         userEntity.setActive(userRequestDto.isActive());
-        userEntity.setCreatedAt(new Date());
+        userEntity.setCreatedAt(Instant.now());
         userEntity.setDateBirth(userRequestDto.getDateBirth());
-        userEntity.setUpdatedAt(new Date());
+        userEntity.setUpdatedAt(Instant.now());
         userEntity.setPassword(bCryptPasswordEncoder.encode(userRequestDto.getPassword()));
 
     }

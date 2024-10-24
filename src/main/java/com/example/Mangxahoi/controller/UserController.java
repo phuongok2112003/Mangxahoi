@@ -31,7 +31,7 @@ public class UserController {
         return  EOResponse.build(userService.delete(id));
     }
 
-    @PreAuthorize("hasAuthority('admin')")
+
     @PutMapping("/{id}")
     public  EOResponse<UserResponseDto>  update(@PathVariable long id,@RequestBody @NonNull UserRequest userDto) {
 

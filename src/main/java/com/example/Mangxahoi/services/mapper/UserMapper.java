@@ -13,14 +13,7 @@ public class UserMapper {
         UserResponseDto dto = new UserResponseDto();
         dto.setUsername(entity.getUsername());
         dto.setEmail(entity.getEmail());
-        dto.setRole(entity.getRole());
         dto.setGender(entity.getGender());
-        dto.setActive(entity.isActive());
-        dto.setCreatedAt(entity.getCreatedAt());
-        dto.setDateBirth(entity.getDateBirth());
-        dto.setUpdatedAt(entity.getUpdatedAt());
-
-
         return dto;
     }
 

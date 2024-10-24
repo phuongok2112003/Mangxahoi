@@ -55,7 +55,6 @@ public class SecurityConfig {
             "/api/auth/**",
             "/authenticate",
             "/user/**",
-            "/image/**"
     };
 
     @Bean

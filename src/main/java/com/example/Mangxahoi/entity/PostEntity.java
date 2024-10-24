@@ -2,12 +2,10 @@ package com.example.Mangxahoi.entity;
 
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 
@@ -17,6 +15,7 @@ import java.util.List;
 @Getter
 @Setter
 @Table(name = "posts")
+@Builder
 public class PostEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +24,7 @@ public class PostEntity {
     private String content;
 
     @ManyToOne
-    @JoinColumn(name = "user_id",referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 
     @OneToMany(mappedBy = "post")
@@ -38,7 +37,7 @@ public class PostEntity {
     private List<ImageEntity> images;
 
     @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    private Instant createdAt;
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private Instant updatedAt;
 }

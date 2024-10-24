@@ -25,7 +25,13 @@ public class ImageController {
 
         return EOResponse.build(imageService.uploadImage(files));
     }
-    @GetMapping("/image/{filename}")
+
+    @PostMapping(value = "/upload-avatar",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public EOResponse<ImageResponse> uploadAvatar(@RequestPart("files") MultipartFile files) {
+
+        return EOResponse.build(imageService.uploadAvatar(files));
+    }
+    @GetMapping("/{filename}")
     public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
         byte[] imgBytes=imageService.getImage(filename);
         HttpHeaders headers = new HttpHeaders();

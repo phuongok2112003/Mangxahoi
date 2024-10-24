@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.Instant;
 import java.util.Date;
 
 @Entity
@@ -27,7 +28,7 @@ public class FavoriteEntity {
     @JoinColumn(name = "post_id",referencedColumnName = "id")
     private PostEntity post;
     @Column(name = "created_at", nullable = false)
-    private Date createdAt;
+    private Instant createdAt;
     @Column(name = "updated_at")
-    private Date updatedAt;
+    private Instant updatedAt;
 }
