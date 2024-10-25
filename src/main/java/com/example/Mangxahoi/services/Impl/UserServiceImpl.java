@@ -219,6 +219,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         userEntity.setUsername(userRequestDto.getUsername());
         userEntity.setEmail(userRequestDto.getEmail());
         userEntity.setRole(userRequestDto.getRole());
+        userEntity.setOccupation(userRequestDto.getOccupation());
+        userEntity.setLocation(userRequestDto.getLocation());
+        userEntity.setAboutMe(userRequestDto.getAboutMe());
         userEntity.setGender(userRequestDto.getGender());
         userEntity.setActive(userRequestDto.isActive());
         userEntity.setCreatedAt(Instant.now());

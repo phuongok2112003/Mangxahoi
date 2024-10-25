@@ -2,6 +2,7 @@ package com.example.Mangxahoi.dto.request;
 
 import com.example.Mangxahoi.constans.enums.UserRole;
 
+import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,4 +22,7 @@ public class UserRequest {
     private Boolean gender ;
     private boolean isActive=true ;
     private LocalDate dateBirth;
+    private String occupation;//nghe nghiep
+    private String location;
+    private String aboutMe;
 }

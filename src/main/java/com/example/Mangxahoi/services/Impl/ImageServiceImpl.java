@@ -89,12 +89,21 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public String deleteImage(String filename) {
-        return "";
+        try {
+            Path path = Paths.get(IMAGE_UPLOAD_DIR + filename);
+            Files.deleteIfExists(path);
+            return "Thành công";
+        } catch (IOException e) {
+            return e.getMessage();
+        }
     }
 
     @Override
-    public List<ImageResponse> updateImage(ImageRequest imageCurr, MultipartFile[] image) {
-        return List.of();
+    public List<ImageResponse> updateImage(ImageRequest imageCurr, MultipartFile[] files) {
+        for(String img:imageCurr.getUrl()){
+            deleteImage(img);
+        }
+        return uploadImage(files);
     }
 
     @Override

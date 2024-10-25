@@ -55,6 +55,8 @@ public class SecurityConfig {
             "/api/auth/**",
             "/authenticate",
             "/user/**",
+            "/image/avatar-image/**",
+            "/image/post-image/**"
     };
 
     @Bean

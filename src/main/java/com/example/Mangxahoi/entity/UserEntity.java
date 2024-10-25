@@ -41,7 +41,7 @@ public class UserEntity implements UserDetails {
     @Column(name = "is_active", nullable = false)
     private boolean isActive=true ;
 
-    @Column(name = "avatar_url", nullable = false)
+    @Column(name = "avatar_url")
     private String avatarUrl;
 
     @Column(name = "occupation", nullable = false)

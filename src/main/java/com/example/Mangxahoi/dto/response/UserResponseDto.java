@@ -19,4 +19,7 @@ public class UserResponseDto {
     private String username;
     private String email;
     private Boolean gender ;
+    private String occupation;//nghe nghiep
+    private String location;
+    private String aboutMe;
 }

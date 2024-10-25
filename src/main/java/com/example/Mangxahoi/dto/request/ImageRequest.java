@@ -1,5 +1,9 @@
 package com.example.Mangxahoi.dto.request;
 
+import lombok.Data;
+
+import java.util.List;
+@Data
 public class ImageRequest {
-    private String url;
+    private List<String> url;
 }

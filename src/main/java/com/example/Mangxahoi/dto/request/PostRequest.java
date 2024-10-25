@@ -1,5 +1,6 @@
 package com.example.Mangxahoi.dto.request;
 
+import com.example.Mangxahoi.dto.response.ImageResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,5 +15,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class PostRequest {
     private String content;
+    private ImageRequest imageRequest;
     
 }

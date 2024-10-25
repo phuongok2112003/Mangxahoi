@@ -5,13 +5,13 @@ import com.example.Mangxahoi.services.ImageService;
 import com.example.Mangxahoi.utils.EOResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 @RestController
@@ -31,12 +31,27 @@ public class ImageController {
 
         return EOResponse.build(imageService.uploadAvatar(files));
     }
-    @GetMapping("/{filename}")
+    @GetMapping("/avatar-image/{filename}")
+    public ResponseEntity<byte[]> getImageAvatar(@PathVariable String filename) throws IOException {
+        byte[] imgBytes = imageService.getImage("/avatar-image/" + filename);
+
+        if (imgBytes != null) {
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(MediaType.IMAGE_JPEG_VALUE));
+            headers.setContentDisposition(ContentDisposition.inline().filename(filename).build());
+
+            return ResponseEntity.ok().headers(headers).body(imgBytes);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+    @GetMapping("/post-image/{filename}")
     public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
-        byte[] imgBytes=imageService.getImage(filename);
+        byte[] imgBytes=imageService.getImage("/post-image/"+filename);
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("inline", filename);
+        headers.setContentType(MediaType.parseMediaType(MediaType.IMAGE_JPEG_VALUE));
+        headers.setContentDisposition(ContentDisposition.inline().filename(filename).build());
         if(imgBytes!=null)
             return ResponseEntity.ok().headers(headers).body(imgBytes);
         else{
