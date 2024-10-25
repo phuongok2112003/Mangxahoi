@@ -35,7 +35,7 @@ import static com.example.Mangxahoi.constans.ErrorCodes.ERROR_CODE;
 public class ImageServiceImpl implements ImageService {
     @Value("${file.upload-image-dir}")
     private String IMAGE_UPLOAD_DIR;
-    private final  UserRepository userRepository;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -56,24 +56,40 @@ public class ImageServiceImpl implements ImageService {
                         MessageCodes.FILE_UPLOAD_NOT_FORMAT, file.getOriginalFilename());
             }
             try {
-                File directory = new File(IMAGE_UPLOAD_DIR+"/post-image/");
+                File directory = new File(IMAGE_UPLOAD_DIR + "/post-image/");
                 if (!directory.exists()) {
                     directory.mkdirs();
                 }
 
-                String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-                Path path = Paths.get(IMAGE_UPLOAD_DIR+"/post-image/" + filename);
+                String fileNameImage = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+                String filename = isValidation(fileNameImage, IMAGE_UPLOAD_DIR + "post-image/");
+                Path path = Paths.get(IMAGE_UPLOAD_DIR + "/post-image/" + filename);
                 Files.write(path, file.getBytes());
                 uploadFIleReponseDto.setUrl("/post-image/" + filename);
-
                 list.add(uploadFIleReponseDto);
 
             } catch (IOException e) {
-                throw new EOException(ERROR_CODE,
-                        e.getMessage(), file.getName());
+                throw new EOException(ERROR_CODE, e.getMessage(), file.getName());
             }
         }
+
         return list;
+    }
+
+    public String isValidation(String fileNameImage, String aHeadFile) {
+        int count = 1;
+        Path path = Paths.get(aHeadFile + fileNameImage);
+        String extension = fileNameImage.contains(".")
+                ? fileNameImage.substring(fileNameImage.lastIndexOf("."))
+                : "";
+        String baseName = fileNameImage.replace(extension, "");
+        String filename = fileNameImage;
+        while (Files.exists(path)) {
+            filename = baseName + "(" + count + ")" + extension;
+            path = Paths.get(aHeadFile + filename);
+            count++;
+        }
+        return filename;
     }
 
     @Override
@@ -100,7 +116,7 @@ public class ImageServiceImpl implements ImageService {
 
     @Override
     public List<ImageResponse> updateImage(ImageRequest imageCurr, MultipartFile[] files) {
-        for(String img:imageCurr.getUrl()){
+        for (String img : imageCurr.getUrl()) {
             deleteImage(img);
         }
         return uploadImage(files);
@@ -121,20 +137,26 @@ public class ImageServiceImpl implements ImageService {
                     MessageCodes.FILE_UPLOAD_NOT_FORMAT, file.getOriginalFilename());
         }
         try {
-            File directory = new File(IMAGE_UPLOAD_DIR+"/avatar-image/");
+            File directory = new File(IMAGE_UPLOAD_DIR + "/avatar-image/");
             if (!directory.exists()) {
                 directory.mkdirs();
             }
+            String fileNameImage = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+            String filename = isValidation(fileNameImage, IMAGE_UPLOAD_DIR + "avatar-image/");
+            Path path = Paths.get(IMAGE_UPLOAD_DIR + "/avatar-image/" + filename);
 
-            String filename = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            Path path = Paths.get(IMAGE_UPLOAD_DIR+"/avatar-image/" + filename);
-            Files.write(path, file.getBytes());
             uploadFIleReponseDto.setUrl("/avatar-image/" + filename);
-            String email= EbsSecurityUtils.getEmail();
-            UserEntity userEntity=userRepository.findByEmail(email);
+            String email = EbsSecurityUtils.getEmail();
+            UserEntity userEntity = userRepository.findByEmail(email);
+
             if (null == userEntity) {
                 throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
-            }else{
+            } else {
+                if (!userEntity.getAvatarUrl().isEmpty())
+                    deleteImage(userEntity.getAvatarUrl());
+                Files.write(path, file.getBytes());
+
+
                 userEntity.setAvatarUrl(uploadFIleReponseDto.getUrl());
                 userRepository.save(userEntity);
             }

@@ -8,7 +8,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface PostService {
-  PostResponse createPost(PostRequest postRequest, MultipartFile[] files) throws JsonProcessingException;
+  PostResponse createPost( PostRequest postRequest , MultipartFile[] files) throws JsonProcessingException;
 
   PostResponse updatePost( Long id,PostRequest postRequest, MultipartFile[] files);
 

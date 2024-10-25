@@ -12,7 +12,7 @@ import com.example.Mangxahoi.entity.PostEntity;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.exceptions.EOException;
-import com.example.Mangxahoi.repository.ImagRepository;
+import com.example.Mangxahoi.repository.ImageRepository;
 import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.DateTimeService;
@@ -46,12 +46,11 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final DateTimeService dateTimeService;
-    private final ImagRepository imagRepository;
+    private final ImageRepository imagRepository;
 
     @Override
-    public PostResponse createPost(  PostRequest postRequest, MultipartFile[] files) throws JsonProcessingException {
-//        ObjectMapper objectMapper = new ObjectMapper();
-//        PostRequest postRequest=objectMapper.readValue(postDto,PostRequest.class);
+    public PostResponse createPost(  PostRequest postRequest, MultipartFile[] files)  {
+
         String email = EbsSecurityUtils.getEmail();
         UserEntity userEntity = userRepository.findByEmail(email);
         if (null == userEntity) {
@@ -66,6 +65,7 @@ public class PostServiceImpl implements PostService {
         List<ImageEntity> imageEntities = new ArrayList<>();
         List<ImageResponse> imageResponseList=new ArrayList<>();
         if(files!=null){
+            imageResponseList = imageService.uploadImage(files);
             saveImage(imageEntities,imageResponseList,files,post);
         }
         post.setImages(imageEntities);
@@ -96,12 +96,33 @@ public class PostServiceImpl implements PostService {
         List<ImageEntity> imageEntities = new ArrayList<>();
         List<ImageResponse> imageResponseList=new ArrayList<>();
         if(files!=null){
-
-            postRequest.getImageRequest().getUrl().stream().map(imageService::deleteImage);
+            imageResponseList = imageService.uploadImage(files);
+            postRequest.getImageRequest().getUrl().forEach(imageService::deleteImage);
+//            List<ImageEntity> image=imagRepository.findByUrlAll(postRequest.getImageRequest().getUrl());
+            List<ImageEntity> image=imagRepository.findByPost(post.getId());
+            if(!image.isEmpty())
+               imagRepository.deleteAll(image);
             saveImage(imageEntities,imageResponseList,files,post);
         }
+        post.setUpdatedAt(Instant.now());
+        post.setContent(postRequest.getContent());
+        if(!imageEntities.isEmpty()){
+            imagRepository.saveAll(imageEntities);
+        }
+        postRepository.save(post);
 
-        return null;
+        return PostResponse.builder()
+                .createdAt(dateTimeService.format(post.getCreatedAt()))
+                .id(post.getId())
+                .content(post.getContent())
+                .user(UserResponseDto.builder()
+                        .id(post.getUser().getId())
+                        .gender(post.getUser().getGender())
+                        .username(post.getUser().getUsername())
+                        .email((post.getUser().getEmail()))
+                        .build())
+                .images(imageResponseList)
+                .build();
     }
 
     @Override
@@ -130,7 +151,7 @@ public class PostServiceImpl implements PostService {
     }
 
     public void saveImage(  List<ImageEntity> imageEntities, List<ImageResponse> imageResponseList,MultipartFile[] files,PostEntity post){
-        imageResponseList = imageService.uploadImage(files);
+
         for (ImageResponse imageResponse : imageResponseList) {
             ImageEntity imageEntity = ImageEntity.builder()
                     .createdAt(Instant.now())

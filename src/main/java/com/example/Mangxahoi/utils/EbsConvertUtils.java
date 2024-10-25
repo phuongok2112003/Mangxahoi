@@ -9,4 +9,8 @@ public class EbsConvertUtils {
     public static String toString(Object dto) throws JsonProcessingException {
         return mapper.writeValueAsString(dto);
     }
+
+    public static <T> T toObject(String dto, Class<T> valueType) throws JsonProcessingException {
+        return mapper.readValue(dto, valueType);
+    }
 }
