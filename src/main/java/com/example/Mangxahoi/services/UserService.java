@@ -19,5 +19,6 @@ public interface UserService {
     EmailResponse sendPasswordResetCode(String email);
 
     String verifyPasswordResetCode(String token,PasswordResetRequest passwordResetRequest);
+    UserResponseDto getUser(Long id);
 
 }

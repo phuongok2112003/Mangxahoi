@@ -22,9 +22,8 @@ public class PostController {
     @PostMapping(value = "/create-post",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public EOResponse<PostResponse> createPost( @RequestPart("PostRequest") String postDto,
                                                 @RequestPart(value="files",required = false) MultipartFile[] files) throws JsonProcessingException {
-//          ObjectMapper objectMapper = new ObjectMapper();
+
         PostRequest postRequest=  EbsConvertUtils.toObject(postDto,PostRequest.class);
-//        PostRequest postRequest=objectMapper.readValue(postDto,PostRequest.class);
             return EOResponse.build(postService.createPost(postRequest, files));
     }
     @GetMapping("/{id}")

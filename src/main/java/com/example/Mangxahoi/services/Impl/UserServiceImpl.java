@@ -215,6 +215,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     }
 
+    @Override
+    public UserResponseDto getUser(Long id) {
+        UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
+                MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+        return entityToDto(entity);
+    }
+
     private  void dtoToEntiy(UserRequest userRequestDto, UserEntity userEntity) {
         userEntity.setUsername(userRequestDto.getUsername());
         userEntity.setEmail(userRequestDto.getEmail());

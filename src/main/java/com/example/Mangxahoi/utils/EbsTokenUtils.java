@@ -21,6 +21,7 @@ public class EbsTokenUtils {
         return JWT.create()
                 .withSubject(user.getEmail())
                 .withClaim("id", user.getId())
+                .withClaim("username",user.getUsername())
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + ACCESS_TOKEN_TIME))
                 .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))

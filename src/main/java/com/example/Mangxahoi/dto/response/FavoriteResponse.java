@@ -6,4 +6,8 @@ import lombok.Data;
 @Data
 @Builder
 public class FavoriteResponse {
+    Long id;
+    String username;
+    Long postId;
+    String createAt;
 }

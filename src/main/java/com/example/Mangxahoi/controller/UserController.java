@@ -60,4 +60,11 @@ public class UserController {
         return   EOResponse.build(token);
     }
 
+    @GetMapping("/{id}")
+    public  EOResponse<UserResponseDto>  update(@PathVariable long id) {
+
+        return  EOResponse.build(userService.getUser(id));
+    }
+
+
 }

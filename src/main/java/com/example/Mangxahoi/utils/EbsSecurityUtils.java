@@ -3,13 +3,18 @@ package com.example.Mangxahoi.utils;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.exceptions.EOException;
+import com.example.Mangxahoi.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.Objects;
-
+@Slf4j
+@RequiredArgsConstructor
 public class EbsSecurityUtils {
+    private final UserRepository userRepository;
     public static boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return !Objects.isNull(authentication) && authentication.isAuthenticated() && !(authentication instanceof AnonymousAuthenticationToken);
@@ -40,5 +45,8 @@ public class EbsSecurityUtils {
         }
 
         throw new EOException(CommonStatus.FORBIDDEN);
+    }
+    public static boolean checkUser(String username){
+        return username.equals(EbsSecurityUtils.getCurrentUser().getUsername());
     }
 }

@@ -62,7 +62,7 @@ public class ImageServiceImpl implements ImageService {
                 }
 
                 String fileNameImage = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-                String filename = isValidation(fileNameImage, IMAGE_UPLOAD_DIR + "post-image/");
+                String filename = isValidation(fileNameImage, IMAGE_UPLOAD_DIR + "/post-image/");
                 Path path = Paths.get(IMAGE_UPLOAD_DIR + "/post-image/" + filename);
                 Files.write(path, file.getBytes());
                 uploadFIleReponseDto.setUrl("/post-image/" + filename);
@@ -108,7 +108,7 @@ public class ImageServiceImpl implements ImageService {
         try {
             Path path = Paths.get(IMAGE_UPLOAD_DIR + filename);
             Files.deleteIfExists(path);
-            return "Thành công";
+            return MessageCodes.PROCESSED_SUCCESSFULLY;
         } catch (IOException e) {
             return e.getMessage();
         }
@@ -142,7 +142,7 @@ public class ImageServiceImpl implements ImageService {
                 directory.mkdirs();
             }
             String fileNameImage = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-            String filename = isValidation(fileNameImage, IMAGE_UPLOAD_DIR + "avatar-image/");
+            String filename = isValidation(fileNameImage, IMAGE_UPLOAD_DIR + "/avatar-image/");
             Path path = Paths.get(IMAGE_UPLOAD_DIR + "/avatar-image/" + filename);
 
             uploadFIleReponseDto.setUrl("/avatar-image/" + filename);

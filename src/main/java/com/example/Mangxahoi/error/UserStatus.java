@@ -9,7 +9,7 @@ public enum UserStatus implements ErrorStatus {
     EMAIL_IS_WRONG_FORMAT(400, "errors.wrong_email_format"),
     CONFIRM_PASSWORD_IS_ERROR(400, "errors.confirm_password_is_error"),
     EMAIL_IS_EXIST(430_005, "errors.email_is_exist"),
-    USERNAME_IS_EXIST(430_003, "errors.username_is_exist"),
+    SENDED_FRIEND(400, "errors.user_sended_friend"),
     USERNAME_IS_EMPTY(400, "errors.username_is_empty"),
     EMAIL_IS_EMPTY(400, "errors.email_is_empty"),
     PASSWORD_IS_EMPTY(400, "errors.password_is_empty"),

@@ -1,12 +1,8 @@
 package com.example.Mangxahoi.services.Impl;
-
-
 import com.example.Mangxahoi.constans.ErrorCodes;
 import com.example.Mangxahoi.constans.MessageCodes;
 import com.example.Mangxahoi.dto.request.PostRequest;
-import com.example.Mangxahoi.dto.response.ImageResponse;
-import com.example.Mangxahoi.dto.response.PostResponse;
-import com.example.Mangxahoi.dto.response.UserResponseDto;
+import com.example.Mangxahoi.dto.response.*;
 import com.example.Mangxahoi.entity.ImageEntity;
 import com.example.Mangxahoi.entity.PostEntity;
 import com.example.Mangxahoi.entity.UserEntity;
@@ -18,21 +14,12 @@ import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.DateTimeService;
 import com.example.Mangxahoi.services.ImageService;
 import com.example.Mangxahoi.services.PostService;
-import com.example.Mangxahoi.utils.EOResponse;
 import com.example.Mangxahoi.utils.EbsSecurityUtils;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,7 +33,7 @@ public class PostServiceImpl implements PostService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final DateTimeService dateTimeService;
-    private final ImageRepository imagRepository;
+    private final ImageRepository imageRepository;
 
     @Override
     public PostResponse createPost(  PostRequest postRequest, MultipartFile[] files)  {
@@ -68,10 +55,10 @@ public class PostServiceImpl implements PostService {
             imageResponseList = imageService.uploadImage(files);
             saveImage(imageEntities,imageResponseList,files,post);
         }
-        post.setImages(imageEntities);
+//        post.setImages(imageEntities);
         postRepository.save(post);
         if(!imageEntities.isEmpty()){
-            imagRepository.saveAll(imageEntities);
+            imageRepository.saveAll(imageEntities);
         }
 
         return PostResponse.builder()
@@ -98,16 +85,16 @@ public class PostServiceImpl implements PostService {
         if(files!=null){
             imageResponseList = imageService.uploadImage(files);
             postRequest.getImageRequest().getUrl().forEach(imageService::deleteImage);
-//            List<ImageEntity> image=imagRepository.findByUrlAll(postRequest.getImageRequest().getUrl());
-            List<ImageEntity> image=imagRepository.findByPost(post.getId());
+            List<ImageEntity> image=imageRepository.findByUrlAll(postRequest.getImageRequest().getUrl());
+//            List<ImageEntity> image=imageRepository.findByPost(post.getId());
             if(!image.isEmpty())
-               imagRepository.deleteAll(image);
+                imageRepository.deleteAll(image);
             saveImage(imageEntities,imageResponseList,files,post);
         }
         post.setUpdatedAt(Instant.now());
         post.setContent(postRequest.getContent());
         if(!imageEntities.isEmpty()){
-            imagRepository.saveAll(imageEntities);
+            imageRepository.saveAll(imageEntities);
         }
         postRepository.save(post);
 
@@ -134,20 +121,43 @@ public class PostServiceImpl implements PostService {
                     ImageResponse.builder()
                             .url(imageEntity.getUrl())
                             .build()
-                )
-                .collect(Collectors.toList());
+                ).toList();
+        List<CommentResponse> commentResponseList=post.getComments().stream().map(commentEntity ->
+                CommentResponse.builder()
+                        .comment(commentEntity.getContent())
+                        .postId(commentEntity.getPost().getId())
+                        .createdAt(dateTimeService.format(commentEntity.getCreatedAt()))
+                        .username(commentEntity.getUser().getUsername())
+                        .build()
+                ).toList();
+        List<FavoriteResponse>favoriteResponses=post.getLikes().stream().map(favoriteEntity ->
+                        FavoriteResponse.builder()
+                                .id(favoriteEntity.getId())
+                                .createAt(dateTimeService.format(favoriteEntity.getCreatedAt()))
+                                .postId(favoriteEntity.getPost().getId())
+                                .username(favoriteEntity.getUser().getUsername())
+                                .build()
+                ).toList();
         return PostResponse.builder()
                 .createdAt(dateTimeService.format(post.getCreatedAt()))
                 .id(post.getId())
                 .content(post.getContent())
+                .comments(commentResponseList)
                 .user(UserResponseDto.builder()
                         .id(post.getUser().getId())
                         .gender(post.getUser().getGender())
                         .username(post.getUser().getUsername())
                         .email((post.getUser().getEmail()))
+
                         .build())
+                .likes(favoriteResponses)
                 .images(imageResponseList)
                 .build();
+    }
+
+    @Override
+    public List<PostResponse> getPostOfFriend(Long userId) {
+        return null;
     }
 
     public void saveImage(  List<ImageEntity> imageEntities, List<ImageResponse> imageResponseList,MultipartFile[] files,PostEntity post){
@@ -162,5 +172,7 @@ public class PostServiceImpl implements PostService {
             imageEntities.add(imageEntity);
         }
     }
+
+
 
 }
