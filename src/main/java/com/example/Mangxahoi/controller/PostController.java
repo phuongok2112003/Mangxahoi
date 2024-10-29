@@ -13,6 +13,8 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/post")
@@ -37,4 +39,8 @@ public class PostController {
         return EOResponse.build(postService.updatePost(id,postRequest,files));
     }
 
+    @GetMapping("/post-of-friend")
+    public  EOResponse<List<PostResponse>> getPostOfFriend() {
+        return EOResponse.build(postService.getPostOfFriend());
+    }
 }

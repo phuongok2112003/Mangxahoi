@@ -9,7 +9,6 @@ public class UserMapper {
         if (entity == null) {
             return null;
         }
-
         UserResponseDto dto = new UserResponseDto();
         dto.setUsername(entity.getUsername());
         dto.setEmail(entity.getEmail());

@@ -16,5 +16,5 @@ public interface PostService {
 
   PostResponse getPost(Long id);
 
-  List<PostResponse> getPostOfFriend(Long userId);
+  List<PostResponse> getPostOfFriend();
 }

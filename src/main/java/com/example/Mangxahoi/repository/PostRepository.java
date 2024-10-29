@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 
 @Repository
@@ -18,4 +19,6 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
             "AND u.id <> :userId " +
             "ORDER BY p.createdAt DESC")
     List<PostEntity> findPostOfFriend(Long userId);
+
+    long countByUserIdAndCreatedAtBetween(Long userId, Instant startOfWeek, Instant endOfWeek);
 }

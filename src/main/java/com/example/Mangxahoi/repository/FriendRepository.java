@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.Instant;
 import java.util.List;
 
 public interface FriendRepository extends JpaRepository<FriendEntity,Long> {
@@ -24,4 +25,10 @@ public interface FriendRepository extends JpaRepository<FriendEntity,Long> {
     @Query("SELECT i FROM FriendEntity i WHERE i.receiver.id = :userid " +
             "AND i.status =REJECTED")
     List<FriendEntity> findAllFriendsREJECTEDByUserId(@Param("userid") Long userid);
+
+    @Query("SELECT COUNT(f) FROM FriendEntity f WHERE f.status = 'ACCEPTED'" +
+            " AND (f.sender.id = :userId OR f.receiver.id = :userId) " +
+            "AND f.createdAt BETWEEN :startOfWeek AND :endOfWeek")
+    long countNewFriends(@Param("userId") Long userId, @Param("startOfWeek") Instant startOfWeek,
+                         @Param("endOfWeek") Instant endOfWeek);
 }

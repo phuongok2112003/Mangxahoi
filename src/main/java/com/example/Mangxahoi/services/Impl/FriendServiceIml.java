@@ -109,6 +109,7 @@ public class FriendServiceIml implements FriendService {
 
     @Override
     public List<FriendResponse> getListFriend(Long userId) {
+        UserEntity userEntity=EbsSecurityUtils.getCurrentUser();
         List<UserEntity> friendEntityList = friendRepository.findAllFriendsByUserId(userId);
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()
@@ -127,8 +128,9 @@ public class FriendServiceIml implements FriendService {
     }
 
     @Override
-    public List<FriendResponse> getListFriendPENDING(Long userId) {
-        List<FriendEntity> friendEntityList = friendRepository.findAllFriendsPENDINGByUserId(userId);
+    public List<FriendResponse> getListFriendPENDING() {
+        UserEntity userEntity=EbsSecurityUtils.getCurrentUser();
+        List<FriendEntity> friendEntityList = friendRepository.findAllFriendsPENDINGByUserId(userEntity.getId());
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()
                         .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
@@ -146,8 +148,9 @@ public class FriendServiceIml implements FriendService {
     }
 
     @Override
-    public List<FriendResponse> rejected(Long userId) {
-        List<FriendEntity> friendEntityList = friendRepository.findAllFriendsREJECTEDByUserId(userId);
+    public List<FriendResponse> rejected() {
+        UserEntity userEntity=EbsSecurityUtils.getCurrentUser();
+        List<FriendEntity> friendEntityList = friendRepository.findAllFriendsREJECTEDByUserId(userEntity.getId());
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()
                         .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))

@@ -15,6 +15,7 @@ import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.CommentService;
 import com.example.Mangxahoi.services.DateTimeService;
+import com.example.Mangxahoi.services.mapper.CommentMapper;
 import com.example.Mangxahoi.utils.EbsSecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.security.access.prepost.PostAuthorize;
@@ -29,7 +30,6 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    private final DateTimeService dateTimeService;
 
     @Override
     public CommentResponse addComment(Long postId,CommentRequest commentRequest) {
@@ -51,12 +51,7 @@ public class CommentServiceImpl implements CommentService {
 
         commentRepository.save(comment);
 
-        return CommentResponse.builder()
-                .comment(comment.getContent())
-                .postId(comment.getPost().getId())
-                .createdAt(dateTimeService.format(comment.getCreatedAt()))
-                .username(comment.getUser().getUsername())
-                .build();
+        return CommentMapper.entityToResponse(comment);
     }
 
 
@@ -74,12 +69,7 @@ public class CommentServiceImpl implements CommentService {
         }else {
             throw new EOException(CommonStatus.FORBIDDEN);
         }
-        return CommentResponse.builder()
-                .comment(commentEntity.getContent())
-                .postId(commentEntity.getPost().getId())
-                .createdAt(dateTimeService.format(commentEntity.getCreatedAt()))
-                .username(commentEntity.getUser().getUsername())
-                .build();
+        return CommentMapper.entityToResponse(commentEntity);
         }
 
     @Override

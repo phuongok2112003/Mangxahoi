@@ -8,6 +8,7 @@ import com.example.Mangxahoi.dto.response.EmailResponse;
 import com.example.Mangxahoi.dto.response.UserResponseDto;
 import com.example.Mangxahoi.services.UserService;
 import com.example.Mangxahoi.utils.EOResponse;
+import jakarta.validation.Valid;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public  EOResponse<UserResponseDto>  save(@RequestBody UserRequest userDto) {
+    public  EOResponse<UserResponseDto>  register(@Valid @RequestBody UserRequest userDto) {
         return  EOResponse.build(userService.register(userDto));
     }
 

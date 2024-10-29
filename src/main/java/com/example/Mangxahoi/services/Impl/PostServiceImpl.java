@@ -14,6 +14,7 @@ import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.DateTimeService;
 import com.example.Mangxahoi.services.ImageService;
 import com.example.Mangxahoi.services.PostService;
+import com.example.Mangxahoi.services.mapper.PostMapper;
 import com.example.Mangxahoi.utils.EbsSecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
@@ -24,6 +25,8 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
 
 @Service
 @AllArgsConstructor
@@ -55,24 +58,13 @@ public class PostServiceImpl implements PostService {
             imageResponseList = imageService.uploadImage(files);
             saveImage(imageEntities,imageResponseList,files,post);
         }
-//        post.setImages(imageEntities);
+        post.setImages(imageEntities);
         postRepository.save(post);
         if(!imageEntities.isEmpty()){
             imageRepository.saveAll(imageEntities);
         }
 
-        return PostResponse.builder()
-                .createdAt(dateTimeService.format(post.getCreatedAt()))
-                .id(post.getId())
-                .content(post.getContent())
-                .user(UserResponseDto.builder()
-                        .id(userEntity.getId())
-                        .gender(userEntity.getGender())
-                        .username(userEntity.getUsername())
-                        .email((userEntity.getEmail()))
-                        .build())
-                .images(imageResponseList)
-                .build();
+        return PostMapper.entiyToResponse(post);
     }
 
     @Override
@@ -98,66 +90,26 @@ public class PostServiceImpl implements PostService {
         }
         postRepository.save(post);
 
-        return PostResponse.builder()
-                .createdAt(dateTimeService.format(post.getCreatedAt()))
-                .id(post.getId())
-                .content(post.getContent())
-                .user(UserResponseDto.builder()
-                        .id(post.getUser().getId())
-                        .gender(post.getUser().getGender())
-                        .username(post.getUser().getUsername())
-                        .email((post.getUser().getEmail()))
-                        .build())
-                .images(imageResponseList)
-                .build();
+        return PostMapper.entiyToResponse(post);
     }
 
     @Override
     public PostResponse getPost(Long id) {
         PostEntity post=postRepository.findById(id).orElseThrow(
                 () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
-        List<ImageResponse> imageResponseList=post.getImages().stream().map(
-                imageEntity ->
-                    ImageResponse.builder()
-                            .url(imageEntity.getUrl())
-                            .build()
-                ).toList();
-        List<CommentResponse> commentResponseList=post.getComments().stream().map(commentEntity ->
-                CommentResponse.builder()
-                        .comment(commentEntity.getContent())
-                        .postId(commentEntity.getPost().getId())
-                        .createdAt(dateTimeService.format(commentEntity.getCreatedAt()))
-                        .username(commentEntity.getUser().getUsername())
-                        .build()
-                ).toList();
-        List<FavoriteResponse>favoriteResponses=post.getLikes().stream().map(favoriteEntity ->
-                        FavoriteResponse.builder()
-                                .id(favoriteEntity.getId())
-                                .createAt(dateTimeService.format(favoriteEntity.getCreatedAt()))
-                                .postId(favoriteEntity.getPost().getId())
-                                .username(favoriteEntity.getUser().getUsername())
-                                .build()
-                ).toList();
-        return PostResponse.builder()
-                .createdAt(dateTimeService.format(post.getCreatedAt()))
-                .id(post.getId())
-                .content(post.getContent())
-                .comments(commentResponseList)
-                .user(UserResponseDto.builder()
-                        .id(post.getUser().getId())
-                        .gender(post.getUser().getGender())
-                        .username(post.getUser().getUsername())
-                        .email((post.getUser().getEmail()))
 
-                        .build())
-                .likes(favoriteResponses)
-                .images(imageResponseList)
-                .build();
+        return PostMapper.entiyToResponse(post);
     }
 
     @Override
-    public List<PostResponse> getPostOfFriend(Long userId) {
-        return null;
+    public List<PostResponse> getPostOfFriend() {
+        UserEntity userEntity=EbsSecurityUtils.getCurrentUser();
+        List<PostEntity> list=postRepository.findPostOfFriend(userEntity.getId());
+        if(list.isEmpty()){
+            throw new EOException(ENTITY_NOT_FOUND,
+                    MessageCodes.NOT_POST, String.valueOf(userEntity.getId()));
+        }
+        return list.stream().map(PostMapper::entiyToResponse).toList();
     }
 
     public void saveImage(  List<ImageEntity> imageEntities, List<ImageResponse> imageResponseList,MultipartFile[] files,PostEntity post){

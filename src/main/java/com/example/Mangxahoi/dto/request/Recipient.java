@@ -1,5 +1,7 @@
 package com.example.Mangxahoi.dto.request;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
@@ -10,5 +12,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Recipient {
     String name;
+    @NotBlank(message = "Email cannot be empty")
+    @Email(message = "Email should be valid")
     String email;
 }

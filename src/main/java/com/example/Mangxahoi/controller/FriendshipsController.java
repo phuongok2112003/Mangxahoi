@@ -32,13 +32,13 @@ public class FriendshipsController {
     public EOResponse<List<FriendResponse>> listFriendACCEPTED(@PathVariable Long id) {
         return EOResponse.build(friendService.getListFriend(id));
     }
-    @GetMapping("/pending/{id}")
-    public EOResponse<List<FriendResponse>> listFriendPENDING(@PathVariable Long id) {
-        return EOResponse.build(friendService.getListFriendPENDING(id));
+    @GetMapping("/pending")
+    public EOResponse<List<FriendResponse>> listFriendPENDING() {
+        return EOResponse.build(friendService.getListFriendPENDING());
     }
-    @GetMapping("/rejected/{id}")
-    public EOResponse<List<FriendResponse>> friendREJECTED(@PathVariable Long id) {
-        return EOResponse.build(friendService.rejected(id));
+    @GetMapping("/rejected")
+    public EOResponse<List<FriendResponse>> friendREJECTED() {
+        return EOResponse.build(friendService.rejected());
     }
 
 }

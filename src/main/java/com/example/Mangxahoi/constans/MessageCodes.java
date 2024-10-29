@@ -3,6 +3,7 @@ package com.example.Mangxahoi.constans;
 public class MessageCodes {
     public static final String ENTITY_NOT_FOUND = "errors.not_found_entity";
     public static final String NOT_NULL = "errors.not_null";
+    public static final String NOT_POST="not record";
     public static final String  NOT_SEND_ADD_FRIEND_FOR_ME="error.not send add friend for me";
     public static final String EMAIL_NOT_FOUND = "errors.not_found_email";
     public static final String ACC_NOT_SEND_ADD_FRIEND="not_send_add_friend";

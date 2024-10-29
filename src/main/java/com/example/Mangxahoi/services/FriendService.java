@@ -12,9 +12,9 @@ public interface FriendService {
 
     List<FriendResponse>getListFriend(Long userId);
 
-    List<FriendResponse>getListFriendPENDING(Long userId);
+    List<FriendResponse>getListFriendPENDING();
 
-    List<FriendResponse> rejected(Long userId);
+    List<FriendResponse> rejected();
 
 
 }

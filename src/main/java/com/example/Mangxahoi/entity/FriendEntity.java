@@ -18,8 +18,8 @@ public class FriendEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "sender_id", nullable = false) // sử dụng @JoinColumn
+    @ManyToOne // Thay đổi từ @OneToOne thành @ManyToOne
+    @JoinColumn(name = "sender_id")// sử dụng @JoinColumn
     private UserEntity sender;
 
     @ManyToOne

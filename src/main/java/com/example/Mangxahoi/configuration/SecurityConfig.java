@@ -55,6 +55,7 @@ public class SecurityConfig {
             "/api/auth/**",
             "/authenticate",
             "/user/**",
+            "/api/login",
             "/image/avatar-image/**",
             "/image/post-image/**"
     };
@@ -69,14 +70,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET,PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated());
 
-        // Đăng nhập qua CustomAuthenticationFilter
-        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager);
-        customAuthenticationFilter.setAuthenticationSuccessHandler(new CustomAuthenticationSuccessHandler(userRepository));
-        customAuthenticationFilter.setAuthenticationFailureHandler(new CustomAuthenticationFailureHandler(userRepository));
-        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
 
-        // Thêm CustomAuthenticationFilter và CustomAuthorizationFilter
-        http.addFilter(customAuthenticationFilter);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
 

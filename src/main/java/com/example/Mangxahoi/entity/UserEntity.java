@@ -1,8 +1,5 @@
 package com.example.Mangxahoi.entity;
-
-
 import com.example.Mangxahoi.constans.enums.UserRole;
-import com.example.Mangxahoi.dto.request.FriendRequest;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -74,8 +71,8 @@ public class UserEntity implements UserDetails {
     @OneToMany(mappedBy = "user")
     private List<FavoriteEntity> likes;
 
-//    @OneToOne(mappedBy = "sender")
-//    private FriendEntity sentFriendRequest;
+    @OneToMany(mappedBy = "sender")
+    private  Set<FriendEntity> sentFriendRequest;
 
     @OneToMany(mappedBy = "receiver")
     private Set<FriendEntity> receivedRequests = new HashSet<>();

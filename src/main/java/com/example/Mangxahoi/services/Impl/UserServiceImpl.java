@@ -114,7 +114,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new EOException(UserStatus.USERNAME_IS_EMPTY);
         }
 
-        if (userRepository.findByEmail(dto.getUsername())!=null) {
+        if (userRepository.findByEmail(dto.getEmail())!=null) {
             throw new EOException(UserStatus.EMAIL_IS_EXIST);
         }
     }

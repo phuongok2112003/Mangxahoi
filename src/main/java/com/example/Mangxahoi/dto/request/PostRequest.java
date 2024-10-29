@@ -14,7 +14,6 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PostRequest {
-    private Long id;
     private String content;
     private ImageRequest imageRequest;
     
