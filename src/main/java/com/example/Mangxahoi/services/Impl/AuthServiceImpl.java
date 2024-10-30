@@ -25,16 +25,12 @@ import java.util.regex.Pattern;
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
-    private static final String EMAIL_REGEX = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
-    private static final Pattern EMAIL_PATTERN = Pattern.compile(EMAIL_REGEX);
     @Override
     public Otp login(LoginRequest loginRequest)  {
         try {
             String username = loginRequest.getUsername();
             String password = loginRequest.getPassword();
-            if (!isValidEmail(username)) {
-              throw new EOException(UserStatus.EMAIL_IS_WRONG_FORMAT);
-            }
+
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             UserEntity user = (UserEntity) authentication.getPrincipal();
@@ -51,9 +47,7 @@ public class AuthServiceImpl implements AuthService {
           return null;
         }
     }
-    private boolean isValidEmail(String email) {
-        return email != null && EMAIL_PATTERN.matcher(email).matches();
-    }
+
 
     private void hasException(AuthenticationException exception) {
         if (exception.getCause() instanceof ProviderNotFoundException) {
