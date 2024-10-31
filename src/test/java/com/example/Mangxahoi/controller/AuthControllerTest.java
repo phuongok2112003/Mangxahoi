@@ -19,6 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+
 @SpringBootTest
 @AutoConfigureMockMvc
 class AuthControllerTest {
@@ -48,7 +50,8 @@ class AuthControllerTest {
                         .content(objectMapper.writeValueAsString(loginRequest)))
 
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("data.code").value("1248"));
+                .andExpect(MockMvcResultMatchers.jsonPath("data.code").value("1248"))
+                .andDo(print());
 
     }
 
@@ -61,6 +64,7 @@ class AuthControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.post("/api/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andDo(print());;
     }
 }

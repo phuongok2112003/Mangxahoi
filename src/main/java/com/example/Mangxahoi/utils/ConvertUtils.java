@@ -3,7 +3,7 @@ package com.example.Mangxahoi.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class EbsConvertUtils {
+public class ConvertUtils {
     private static final ObjectMapper mapper = new ObjectMapper();
 
     public static String toString(Object dto) throws JsonProcessingException {

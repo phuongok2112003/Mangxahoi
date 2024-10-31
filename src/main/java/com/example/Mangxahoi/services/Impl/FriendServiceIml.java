@@ -13,7 +13,7 @@ import com.example.Mangxahoi.repository.FriendRepository;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.DateTimeService;
 import com.example.Mangxahoi.services.FriendService;
-import com.example.Mangxahoi.utils.EbsSecurityUtils;
+import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +34,7 @@ public class FriendServiceIml implements FriendService {
     @Transactional
     @Override
     public FriendResponse addFriend(Long receiverId) {
-        String email = EbsSecurityUtils.getEmail();
+        String email = SecurityUtils.getEmail();
         UserEntity sender = userRepository.findByEmail(email);
         if (null == sender) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
@@ -78,7 +78,7 @@ public class FriendServiceIml implements FriendService {
                 .orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
                         MessageCodes.ENTITY_NOT_FOUND, String.valueOf(senderId)));
 
-        String email = EbsSecurityUtils.getEmail();
+        String email = SecurityUtils.getEmail();
         UserEntity userCurr = userRepository.findByEmail(email);
         if (null == userCurr) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
@@ -109,7 +109,7 @@ public class FriendServiceIml implements FriendService {
 
     @Override
     public List<FriendResponse> getListFriend(Long userId) {
-        UserEntity userEntity=EbsSecurityUtils.getCurrentUser();
+        UserEntity userEntity= SecurityUtils.getCurrentUser();
         List<UserEntity> friendEntityList = friendRepository.findAllFriendsByUserId(userId);
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()
@@ -129,7 +129,7 @@ public class FriendServiceIml implements FriendService {
 
     @Override
     public List<FriendResponse> getListFriendPENDING() {
-        UserEntity userEntity=EbsSecurityUtils.getCurrentUser();
+        UserEntity userEntity= SecurityUtils.getCurrentUser();
         List<FriendEntity> friendEntityList = friendRepository.findAllFriendsPENDINGByUserId(userEntity.getId());
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()
@@ -149,7 +149,7 @@ public class FriendServiceIml implements FriendService {
 
     @Override
     public List<FriendResponse> rejected() {
-        UserEntity userEntity=EbsSecurityUtils.getCurrentUser();
+        UserEntity userEntity= SecurityUtils.getCurrentUser();
         List<FriendEntity> friendEntityList = friendRepository.findAllFriendsREJECTEDByUserId(userEntity.getId());
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()

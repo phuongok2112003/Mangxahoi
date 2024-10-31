@@ -25,7 +25,7 @@ import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.EmailService;
 import com.example.Mangxahoi.services.UserService;
 
-import com.example.Mangxahoi.utils.EbsTokenUtils;
+import com.example.Mangxahoi.utils.TokenUtils;
 import com.example.Mangxahoi.utils.RenderCodeTest;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,6 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.time.Instant;
-import java.util.Date;
 
 
 import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
@@ -100,8 +99,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public TokenDto getToken(Otp otp) {
         UserEntity user =  userRepository.findByEmail(otp.getEmail());
         if(user.getOtp().equals(otp.getCode())){
-            String accessToken = EbsTokenUtils.createAccessToken(user);
-            String refreshToken = EbsTokenUtils.createRefreshToken(user.getUsername());
+            String accessToken = TokenUtils.createAccessToken(user);
+            String refreshToken = TokenUtils.createRefreshToken(user.getUsername());
 
             return new TokenDto(accessToken, refreshToken);
         }
@@ -140,7 +139,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         }
 
-        String accessToken = EbsTokenUtils.createAccessToken(user);
+        String accessToken = TokenUtils.createAccessToken(user);
         return new TokenDto(accessToken, refreshToken);
     }
 
@@ -152,7 +151,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new EOException(ENTITY_NOT_FOUND,
                     MessageCodes.EMAIL_NOT_FOUND, String.valueOf(email));
         }
-        String token=  EbsTokenUtils.createCode(code,email);
+        String token=  TokenUtils.createCode(code,email);
         user.setOtp(token);
         userRepository.save(user);
 

@@ -13,7 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
-public class EbsSecurityUtils {
+public class SecurityUtils {
     private final UserRepository userRepository;
     public static boolean isAuthenticated() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -47,6 +47,6 @@ public class EbsSecurityUtils {
         throw new EOException(CommonStatus.FORBIDDEN);
     }
     public static boolean checkUser(String username){
-        return username.equals(EbsSecurityUtils.getCurrentUser().getUsername());
+        return username.equals(SecurityUtils.getCurrentUser().getUsername());
     }
 }

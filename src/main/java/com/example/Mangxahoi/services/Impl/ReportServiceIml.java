@@ -7,7 +7,7 @@ import com.example.Mangxahoi.repository.LikeRepository;
 import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.services.ReportService;
 import com.example.Mangxahoi.utils.DateUtil;
-import com.example.Mangxahoi.utils.EbsSecurityUtils;
+import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +31,7 @@ public class ReportServiceIml implements ReportService {
         Instant startDate = DateUtil.getStartOfWeek();
         Instant endDate = DateUtil.getEndOfWeek();
 
-        UserEntity userEntity= EbsSecurityUtils.getCurrentUser();
+        UserEntity userEntity= SecurityUtils.getCurrentUser();
         long postsCount = postRepository.countByUserIdAndCreatedAtBetween(userEntity.getId(), startDate,endDate);
         long newFriendsCount = friendRepository.countNewFriends(userEntity.getId(), startDate,endDate);
         long likesCount = likeRepository.countByUserIdAndCreatedAtBetween(userEntity.getId(), startDate,endDate);

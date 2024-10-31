@@ -15,7 +15,7 @@ import com.example.Mangxahoi.services.DateTimeService;
 import com.example.Mangxahoi.services.ImageService;
 import com.example.Mangxahoi.services.PostService;
 import com.example.Mangxahoi.services.mapper.PostMapper;
-import com.example.Mangxahoi.utils.EbsSecurityUtils;
+import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
 
@@ -41,7 +40,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponse createPost(  PostRequest postRequest, MultipartFile[] files)  {
 
-        String email = EbsSecurityUtils.getEmail();
+        String email = SecurityUtils.getEmail();
         UserEntity userEntity = userRepository.findByEmail(email);
         if (null == userEntity) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
@@ -103,7 +102,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostResponse> getPostOfFriend() {
-        UserEntity userEntity=EbsSecurityUtils.getCurrentUser();
+        UserEntity userEntity= SecurityUtils.getCurrentUser();
         List<PostEntity> list=postRepository.findPostOfFriend(userEntity.getId());
         if(list.isEmpty()){
             throw new EOException(ENTITY_NOT_FOUND,

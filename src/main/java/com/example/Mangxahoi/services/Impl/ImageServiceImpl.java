@@ -3,13 +3,12 @@ package com.example.Mangxahoi.services.Impl;
 import com.example.Mangxahoi.constans.MessageCodes;
 import com.example.Mangxahoi.dto.request.ImageRequest;
 import com.example.Mangxahoi.dto.response.ImageResponse;
-import com.example.Mangxahoi.dto.response.UserResponseDto;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.exceptions.EOException;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.ImageService;
-import com.example.Mangxahoi.utils.EbsSecurityUtils;
+import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -146,7 +145,7 @@ public class ImageServiceImpl implements ImageService {
             Path path = Paths.get(IMAGE_UPLOAD_DIR + "/avatar-image/" + filename);
 
             uploadFIleReponseDto.setUrl("/avatar-image/" + filename);
-            String email = EbsSecurityUtils.getEmail();
+            String email = SecurityUtils.getEmail();
             UserEntity userEntity = userRepository.findByEmail(email);
 
             if (null == userEntity) {

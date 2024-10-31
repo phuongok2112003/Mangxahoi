@@ -11,10 +11,9 @@ import com.example.Mangxahoi.exceptions.EOException;
 import com.example.Mangxahoi.repository.LikeRepository;
 import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.repository.UserRepository;
-import com.example.Mangxahoi.services.DateTimeService;
 import com.example.Mangxahoi.services.LikeService;
 import com.example.Mangxahoi.services.mapper.FavoriteMapper;
-import com.example.Mangxahoi.utils.EbsSecurityUtils;
+import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,7 +27,7 @@ public class LikeServiceImpl implements LikeService {
     private final LikeRepository likeRepository;
     @Override
     public FavoriteResponse like(Long postId) {
-        String email = EbsSecurityUtils.getEmail();
+        String email = SecurityUtils.getEmail();
         UserEntity userEntity = userRepository.findByEmail(email);
         if (null == userEntity) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
@@ -53,7 +52,7 @@ public class LikeServiceImpl implements LikeService {
         FavoriteEntity favoriteEntity=likeRepository.findById(id).orElseThrow(
                 () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND,
                         MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
-        if (EbsSecurityUtils.checkUser(favoriteEntity.getUser().getUsername())) {
+        if (SecurityUtils.checkUser(favoriteEntity.getUser().getUsername())) {
             likeRepository.delete(favoriteEntity);
         }else {
             throw new EOException(CommonStatus.FORBIDDEN);

@@ -4,7 +4,6 @@ import com.example.Mangxahoi.constans.ErrorCodes;
 import com.example.Mangxahoi.constans.MessageCodes;
 import com.example.Mangxahoi.dto.request.CommentRequest;
 import com.example.Mangxahoi.dto.response.CommentResponse;
-import com.example.Mangxahoi.dto.response.UserResponseDto;
 import com.example.Mangxahoi.entity.CommentEntity;
 import com.example.Mangxahoi.entity.PostEntity;
 import com.example.Mangxahoi.entity.UserEntity;
@@ -14,12 +13,9 @@ import com.example.Mangxahoi.repository.CommentRepository;
 import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.CommentService;
-import com.example.Mangxahoi.services.DateTimeService;
 import com.example.Mangxahoi.services.mapper.CommentMapper;
-import com.example.Mangxahoi.utils.EbsSecurityUtils;
+import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PostAuthorize;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -33,7 +29,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public CommentResponse addComment(Long postId,CommentRequest commentRequest) {
-        String email = EbsSecurityUtils.getEmail();
+        String email = SecurityUtils.getEmail();
         UserEntity userEntity = userRepository.findByEmail(email);
         if (null == userEntity) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
@@ -61,7 +57,7 @@ public class CommentServiceImpl implements CommentService {
         CommentEntity commentEntity=commentRepository.findById(id).orElseThrow(
                 () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND,
                         MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
-        if (EbsSecurityUtils.checkUser(commentEntity.getUser().getUsername())) {
+        if (SecurityUtils.checkUser(commentEntity.getUser().getUsername())) {
             commentEntity.setContent(commentRequest.getComment());
             commentEntity.setUpdatedAt(Instant.now());
             commentEntity.setCreatedAt(Instant.now());
@@ -77,8 +73,8 @@ public class CommentServiceImpl implements CommentService {
         CommentEntity commentEntity=commentRepository.findById(id).orElseThrow(
                 () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND,
                         MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
-        if (EbsSecurityUtils.checkUser(commentEntity.getUser().getUsername())||
-                EbsSecurityUtils.checkUser(commentEntity.getPost().getUser().getUsername())) {
+        if (SecurityUtils.checkUser(commentEntity.getUser().getUsername())||
+                SecurityUtils.checkUser(commentEntity.getPost().getUser().getUsername())) {
             commentRepository.delete(commentEntity);
             return  MessageCodes.PROCESSED_SUCCESSFULLY ;
         }

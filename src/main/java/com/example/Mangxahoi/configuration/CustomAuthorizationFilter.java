@@ -12,7 +12,7 @@ import com.example.Mangxahoi.constans.enums.Variables;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.error.DataError;
-import com.example.Mangxahoi.utils.EbsConvertUtils;
+import com.example.Mangxahoi.utils.ConvertUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -56,7 +56,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(EbsConvertUtils.toString(DataError.build(CommonStatus.TokenExpired)));
+            response.getWriter().write(ConvertUtils.toString(DataError.build(CommonStatus.TokenExpired)));
             response.getWriter().flush();
         }catch (SignatureVerificationException ex){
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -67,7 +67,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         catch (JWTVerificationException ex) {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(EbsConvertUtils.toString(DataError.build(CommonStatus.TokenIsInvalid)));
+            response.getWriter().write(ConvertUtils.toString(DataError.build(CommonStatus.TokenIsInvalid)));
             response.getWriter().flush();
         }
     }

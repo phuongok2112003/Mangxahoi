@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import static com.example.Mangxahoi.constans.enums.Variables.*;
 
 
-public class EbsTokenUtils {
+public class TokenUtils {
     private static final Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
 
     public static String createAccessToken(UserEntity user) {
