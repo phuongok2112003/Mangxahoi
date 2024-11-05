@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
           entity.setActive(false);
           userRepository.save(entity);
-          return "thanh cong";
+          return MessageCodes.PROCESSED_SUCCESSFULLY;
     }
 
     @Override
@@ -100,7 +100,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         UserEntity user =  userRepository.findByEmail(otp.getEmail());
         if(user.getOtp().equals(otp.getCode())){
             String accessToken = TokenUtils.createAccessToken(user);
-            String refreshToken = TokenUtils.createRefreshToken(user.getUsername());
+            String refreshToken = TokenUtils.createRefreshToken(user.getEmail());
 
             return new TokenDto(accessToken, refreshToken);
         }
@@ -140,6 +140,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         String accessToken = TokenUtils.createAccessToken(user);
+        refreshToken=TokenUtils.createRefreshToken(user.getEmail());
         return new TokenDto(accessToken, refreshToken);
     }
 

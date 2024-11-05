@@ -28,9 +28,9 @@ public class TokenUtils {
                 .sign(algorithm);
     }
 
-    public static String createRefreshToken(String username) {
+    public static String createRefreshToken(String email) {
         return JWT.create()
-                .withSubject(username)
+                .withSubject(email)
                 .withExpiresAt(new Date(System.currentTimeMillis() + REFRESH_TOKEN_TIME))
                 .sign(algorithm);
     }

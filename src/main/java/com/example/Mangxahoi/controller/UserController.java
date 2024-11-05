@@ -44,8 +44,8 @@ public class UserController {
         return EOResponse.build(userService.getToken(otp));
     }
     @PostMapping("/refresh-token")
-    public TokenDto refreshToken(@RequestParam("token") String token) {
-        return userService.refreshToken(token);
+    public EOResponse<TokenDto> refreshToken(@RequestParam("token") String token) {
+        return  EOResponse.build(userService.refreshToken(token));
     }
 
     @PostMapping("/forgot")

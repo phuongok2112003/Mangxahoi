@@ -36,22 +36,22 @@ public class UserEntity implements UserDetails {
     @Column(name = "gender", nullable = false)
     private Boolean gender ;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active")
     private boolean isActive=true ;
 
     @Column(name = "avatar_url")
     private String avatarUrl;
 
-    @Column(name = "occupation", nullable = false)
+    @Column(name = "occupation")
     private String occupation;//nghe nghiep
 
-    @Column(name = "location", nullable = false)
+    @Column(name = "location")
     private String location;
 
-    @Column(name = "about_me", nullable = false)
+    @Column(name = "about_me")
     private String aboutMe;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(name = "created_at")
     private Instant createdAt;
 
     @Column(name = "updated_at")

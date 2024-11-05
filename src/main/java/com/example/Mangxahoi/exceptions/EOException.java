@@ -2,9 +2,12 @@ package com.example.Mangxahoi.exceptions;
 
 import com.example.Mangxahoi.error.ErrorStatus;
 import com.example.Mangxahoi.utils.I18n;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
-
+@EqualsAndHashCode(callSuper = true)
+@Data
 public class EOException extends RuntimeException{
     protected final int code;
     protected final String message;
