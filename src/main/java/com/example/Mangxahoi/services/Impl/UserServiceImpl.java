@@ -1,14 +1,8 @@
 package com.example.Mangxahoi.services.Impl;
-
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.Mangxahoi.constans.MessageCodes;
-
 import com.example.Mangxahoi.constans.enums.UserRole;
-import com.example.Mangxahoi.constans.enums.Variables;
 import com.example.Mangxahoi.dto.Otp;
 import com.example.Mangxahoi.dto.TokenDto;
 import com.example.Mangxahoi.dto.request.PasswordResetRequest;
@@ -24,7 +18,6 @@ import com.example.Mangxahoi.exceptions.EOException;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.EmailService;
 import com.example.Mangxahoi.services.UserService;
-
 import com.example.Mangxahoi.utils.TokenUtils;
 import com.example.Mangxahoi.utils.RenderCodeTest;
 import lombok.NonNull;
@@ -41,7 +34,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.IOException;
 import java.time.Instant;
+import java.util.Map;
 
 
 import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
@@ -128,11 +123,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public TokenDto refreshToken(String refreshToken) {
-        Algorithm algorithm = Algorithm.HMAC256(Variables.SECRET_KEY.getBytes());
-        JWTVerifier verifier = JWT.require(algorithm).build();
-        DecodedJWT decodedJWT = verifier.verify(refreshToken);
-        String email = decodedJWT.getSubject();
+    public TokenDto refreshToken(String refreshToken)  {
+        Map<String, Object> claims = TokenUtils.verifyToken(refreshToken);
+        String email = claims.get("email").toString();
         UserEntity user = userRepository.findByEmail(email);
 
         if (null == user) {
@@ -186,11 +179,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         try{
-            Algorithm algorithm = Algorithm.HMAC256(Variables.SECRET_KEY.getBytes());
-            JWTVerifier verifier = JWT.require(algorithm).build();
-            DecodedJWT decodedJWT = verifier.verify(token);
-
-            String email = decodedJWT.getSubject();
+            Map<String, Object> claims = TokenUtils.verifyToken(token);
+            String email = claims.get("email").toString();
             UserEntity user = userRepository.findByEmail(email);
             if(user==null){
                 throw new EOException(ENTITY_NOT_FOUND,
@@ -211,6 +201,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             }
         }catch (TokenExpiredException ex){
             throw new EOException(CommonStatus.TokenExpired);
+        }
+        catch (JWTVerificationException ex){
+            throw new EOException(CommonStatus.TokenIsInvalid);
         }
 
     }

@@ -3,8 +3,11 @@ package com.example.Mangxahoi.service;
 import com.example.Mangxahoi.dto.Otp;
 import com.example.Mangxahoi.dto.request.LoginRequest;
 import com.example.Mangxahoi.entity.UserEntity;
+import com.example.Mangxahoi.error.CommonStatus;
+import com.example.Mangxahoi.exceptions.EOException;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.AuthService;
+import com.example.Mangxahoi.services.Impl.AuthServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,17 +19,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -41,8 +43,8 @@ public class AuthServiceTest {
     @Mock
     private UserRepository userRepository;
 
-    @Autowired
-    private AuthService authService;
+    @InjectMocks
+    private AuthServiceImpl authService;
 
 
     private LoginRequest loginRequest;
@@ -89,47 +91,22 @@ public class AuthServiceTest {
         assertNotNull(result);
         assertEquals(username, result.getEmail());
         assertNotNull(result.getCode());
-//        verify(userEntity).setOtp(result.getCode());
-//        verify(userRepository).save(userEntity);
+
     }
 
     @Test
     void login_ShouldReturnNull_WhenAuthenticationFails() {
         // Given
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenThrow(new UsernameNotFoundException("User not found"));
+                .thenThrow(ProviderNotFoundException.class);
 
         // When
-        Otp result = authService.login(loginRequest);
+        EOException exception = assertThrows(EOException.class, () -> {
+            authService.login(loginRequest);
+        });
 
-        // Then
-        assertNull(result);
+
+        assertEquals(CommonStatus.ACCOUNT_NOT_FOUND.getMessage(), exception.getMessage());
     }
 
-//    @Test
-//    public void testLoginWithInvalidCredentials() {
-//        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-//                .thenThrow(new org.springframework.security.authentication.BadCredentialsException("Invalid credentials"));
-//
-//        EOException exception = assertThrows(EOException.class, () -> authService.login(loginRequest));
-//        assertEquals(CommonStatus.ACCOUNT_NOT_FOUND, exception.getStatus());
-//    }
-
-//    @Test
-//    public void testLoginWhenAccountLocked() {
-//        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-//                .thenThrow(new org.springframework.security.authentication.LockedException("Account is locked"));
-//
-//        EOException exception = assertThrows(EOException.class, () -> authService.login(loginRequest));
-//        assertEquals(CommonStatus.ACCOUNT_HAS_BEEN_LOCKED, exception.getStatus());
-//    }
-//
-//    @Test
-//    public void testLoginWhenAccountDisabled() {
-//        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-//                .thenThrow(new org.springframework.security.authentication.DisabledException("Account is disabled"));
-//
-//        EOException exception = assertThrows(EOException.class, () -> authService.login(loginRequest));
-//        assertEquals(CommonStatus.ACCOUNT_IS_NOT_ACTIVATED, exception.getStatus());
-//    }
 }

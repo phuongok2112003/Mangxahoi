@@ -15,7 +15,6 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
-
 public class ExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(ExceptionHandler.class);
     public ExceptionHandler() {

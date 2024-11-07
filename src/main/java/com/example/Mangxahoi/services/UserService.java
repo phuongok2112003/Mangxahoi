@@ -9,6 +9,8 @@ import com.example.Mangxahoi.dto.response.EmailResponse;
 import com.example.Mangxahoi.dto.response.UserResponseDto;
 import lombok.NonNull;
 
+import java.io.IOException;
+
 
 public interface UserService {
     UserResponseDto register(UserRequest dto);

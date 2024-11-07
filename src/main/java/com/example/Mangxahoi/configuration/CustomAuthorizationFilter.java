@@ -1,18 +1,13 @@
 package com.example.Mangxahoi.configuration;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-
-import com.example.Mangxahoi.constans.enums.Variables;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.error.DataError;
 import com.example.Mangxahoi.utils.ConvertUtils;
+import com.example.Mangxahoi.utils.TokenUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,10 +23,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Map;
 
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
-
-
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -58,13 +52,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(ConvertUtils.toString(DataError.build(CommonStatus.TokenExpired)));
             response.getWriter().flush();
-        }catch (SignatureVerificationException ex){
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.getWriter().write(ex.getMessage());
-            response.getWriter().flush();
-        }
-        catch (JWTVerificationException ex) {
+        } catch (JWTVerificationException ex) {
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.getWriter().write(ConvertUtils.toString(DataError.build(CommonStatus.TokenIsInvalid)));
@@ -72,20 +60,18 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         }
     }
 
-    private void processJwtAuthentication(String token) {
-        Algorithm algorithm = Algorithm.HMAC256(Variables.SECRET_KEY.getBytes());
-        JWTVerifier verifier = JWT.require(algorithm).build();
-        DecodedJWT decodedJWT = verifier.verify(token);
+    private void processJwtAuthentication(String token)  {
 
-        String email = decodedJWT.getSubject();
-        Long userId = decodedJWT.getClaim("id").asLong();
-        String username=decodedJWT.getClaim("username").asString();
+        Map<String, Object> claims = TokenUtils.verifyToken(token);
+        String email = claims.get("email").toString();
+        Long userId =(Long) claims.get("id");
+        String username=claims.get("username").toString();
         UserEntity user = new UserEntity();
         user.setId(userId);
         user.setEmail(email);
         user.setUsername(username);
 
-        String[] roles = decodedJWT.getClaim("roles").asArray(String.class);
+        String[] roles = (String[]) claims.get("roles");
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         Arrays.stream(roles).forEach((role) -> authorities.add(new SimpleGrantedAuthority(role)));
 

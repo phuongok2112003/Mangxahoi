@@ -50,21 +50,6 @@ public class AuthServiceImpl implements AuthService {
 
 
     private void hasException(AuthenticationException exception) {
-        if (exception.getCause() instanceof ProviderNotFoundException) {
-            throw new EOException((CommonStatus.ACCOUNT_NOT_FOUND));
-        }
-
-        if (exception.getCause() instanceof LockedException) {
-            throw new EOException(CommonStatus.TEMPORARY_LOCK_NOT_FINISH);
-        }
-
-        if (exception instanceof LockedException) {
-            throw new EOException(CommonStatus.ACCOUNT_HAS_BEEN_LOCKED);
-        }
-
-        if (exception instanceof DisabledException) {
-            throw new EOException(CommonStatus.ACCOUNT_IS_NOT_ACTIVATED);
-        }
         throw new EOException((CommonStatus.ACCOUNT_NOT_FOUND));
 
     }
