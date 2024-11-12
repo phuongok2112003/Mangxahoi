@@ -135,6 +135,7 @@ public class FriendServiceIml implements FriendService {
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()
                         .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
+                        .status(friendEntity.getStatus())
                         .sender(UserResponseDto.builder()
                                 .id(friendEntity.getSender().getId())
                                 .aboutMe(friendEntity.getSender().getAboutMe())

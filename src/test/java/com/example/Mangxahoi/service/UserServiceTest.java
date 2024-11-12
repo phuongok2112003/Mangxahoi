@@ -48,15 +48,12 @@ import static org.springframework.test.util.AssertionErrors.assertEquals;
 @SpringBootTest
 @Slf4j
 @AutoConfigureMockMvc
-@TestPropertySource("/test.properties")
 public class UserServiceTest {
     @Mock
     private UserRepository userRepository;
 
     @Mock
     private EmailService emailService;
-
-
     @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 

@@ -24,6 +24,7 @@ public class PostMapper {
                 .id(entity.getId())
                 .content(entity.getContent())
                 .comments(commentResponseList)
+                .status(entity.getStatus())
                 .user(UserResponseDto.builder()
                         .id(entity.getUser().getId())
                         .gender(entity.getUser().getGender())

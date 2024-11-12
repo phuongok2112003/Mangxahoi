@@ -8,12 +8,14 @@ import com.example.Mangxahoi.exceptions.EOException;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.AuthService;
 import com.example.Mangxahoi.services.Impl.AuthServiceImpl;
+import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -35,27 +37,20 @@ import static org.mockito.Mockito.*;
 @SpringBootTest
 @AutoConfigureMockMvc
 @Slf4j
-@TestPropertySource("/test.properties")
 public class AuthServiceTest {
     @Mock
     private AuthenticationManager authenticationManager;
-
-    @Mock
-    private UserRepository userRepository;
-
     @InjectMocks
     private AuthServiceImpl authService;
-
-
     private LoginRequest loginRequest;
-
-    @MockBean
+    @Mock
     private Authentication authentication;
-    @Autowired
+    @Mock
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
     private UserEntity userEntity;
 
+    @Mock
+    UserRepository userRepository;
     @BeforeEach
     void setUp() {
         loginRequest=LoginRequest.builder()
@@ -83,6 +78,7 @@ public class AuthServiceTest {
                 .thenReturn(authentication);
         when(authentication.getPrincipal()).thenReturn(userEntity);
 
+        when(userRepository.save(userEntity)).thenReturn(userEntity);
 
         // When
         Otp result = authService.login(loginRequest);

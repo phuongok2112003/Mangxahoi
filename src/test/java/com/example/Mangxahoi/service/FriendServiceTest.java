@@ -48,12 +48,8 @@ public class FriendServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
     @Mock
     private DateTimeService dateTimeService;
-
-    @Mock
-    private SecurityUtils securityUtils;
 
     @InjectMocks
     private FriendServiceIml friendService;
@@ -211,23 +207,24 @@ public class FriendServiceTest {
 
     @Test
     void getListFriendPENDING_success() {
-        UserEntity user = new UserEntity();
-        user.setId(1L);
-
-        FriendEntity pendingFriend = new FriendEntity();
-        pendingFriend.setStatus(FriendshipStatus.PENDING);
-
-        when(SecurityUtils.getCurrentUser()).thenReturn(user);
-        when(friendRepository.findAllFriendsPENDINGByUserId(user.getId())).thenReturn(List.of(pendingFriend));
+        try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
 
 
-        List<FriendResponse> result = friendService.getListFriendPENDING();
+            FriendEntity pendingFriend = new FriendEntity();
+            pendingFriend.setStatus(FriendshipStatus.PENDING);
+            pendingFriend.setSender(sender);
 
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(FriendshipStatus.PENDING, result.get(0).getStatus());
+            mockedUtils.when(()->SecurityUtils.getCurrentUser()).thenReturn(receiver);
+            when(friendRepository.findAllFriendsPENDINGByUserId(receiver.getId())).thenReturn(List.of(pendingFriend));
+
+
+            List<FriendResponse> result = friendService.getListFriendPENDING();
+
+            assertNotNull(result);
+            assertEquals(1, result.size());
+            assertEquals(FriendshipStatus.PENDING, result.get(0).getStatus());
+        }
     }
-
     @Test
     void rejected_success() {
         try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {

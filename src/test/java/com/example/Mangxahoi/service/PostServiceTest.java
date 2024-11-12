@@ -129,36 +129,36 @@ public class PostServiceTest {
 
     @Test
     void testCreatePost_Success() {
-        MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class);
-        mockedUtils.when(SecurityUtils::getEmail).thenReturn("admin@gmail.com");
-        when(userRepository.findByEmail("admin@gmail.com")).thenReturn(userEntity);
-        when(postRepository.save(any(PostEntity.class))).thenReturn(postEntity);
+        try( MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
+            mockedUtils.when(SecurityUtils::getEmail).thenReturn("admin@gmail.com");
+            when(userRepository.findByEmail("admin@gmail.com")).thenReturn(userEntity);
+            when(postRepository.save(any(PostEntity.class))).thenReturn(postEntity);
 
-        // Act
-        PostResponse response = postService.createPost(postRequest, files);
+            // Act
+            PostResponse response = postService.createPost(postRequest, files);
 
-        // Assert
-        assertNotNull(response);
-        assertEquals("Test post content", response.getContent());
-        log.info(response.getImages().toString());
+            // Assert
+            assertNotNull(response);
+            assertEquals("Test post content", response.getContent());
+            log.info(response.getImages().toString());
 
+        }
     }
-
     @Test
     void testCreatePost_UserNotFound() {
         // Arrange
-        MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class);
-        mockedUtils.when(SecurityUtils::getEmail).thenReturn("admin@gmail.com");
-        when(userRepository.findByEmail("admin@gmail.com")).thenReturn(null);
+        try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
+            mockedUtils.when(SecurityUtils::getEmail).thenReturn("admin@gmail.com");
+            when(userRepository.findByEmail("admin@gmail.com")).thenReturn(null);
 
 
-        // Act & Assert
-        EOException exception = assertThrows(EOException.class, () -> {
-            postService.createPost(postRequest, files);
-        });
-        Assertions.assertEquals(CommonStatus.ACCOUNT_NOT_FOUND.getMessage(), exception.getMessage());
+            // Act & Assert
+            EOException exception = assertThrows(EOException.class, () -> {
+                postService.createPost(postRequest, files);
+            });
+            Assertions.assertEquals(CommonStatus.ACCOUNT_NOT_FOUND.getMessage(), exception.getMessage());
+        }
     }
-
     @Test
     void testUpdatePost_Success() {
         // Arrange

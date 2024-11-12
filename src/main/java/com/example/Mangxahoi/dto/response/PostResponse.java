@@ -1,5 +1,6 @@
 package com.example.Mangxahoi.dto.response;
 
+import com.example.Mangxahoi.constans.enums.PostStatus;
 import com.example.Mangxahoi.entity.UserEntity;
 
 import com.example.Mangxahoi.repository.UserRepository;
@@ -25,4 +26,5 @@ public class PostResponse {
 
     private String createdAt;
 
+    private PostStatus status;
 }

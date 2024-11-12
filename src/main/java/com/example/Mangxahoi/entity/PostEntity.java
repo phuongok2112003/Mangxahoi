@@ -1,6 +1,8 @@
 package com.example.Mangxahoi.entity;
 
 
+import com.example.Mangxahoi.constans.enums.FriendshipStatus;
+import com.example.Mangxahoi.constans.enums.PostStatus;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -35,6 +37,9 @@ public class PostEntity {
 
     @OneToMany(mappedBy = "post")
     private List<ImageEntity> images;
+
+    @Enumerated(EnumType.STRING)
+    private PostStatus status;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

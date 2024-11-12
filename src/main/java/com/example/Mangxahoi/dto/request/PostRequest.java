@@ -1,5 +1,6 @@
 package com.example.Mangxahoi.dto.request;
 
+import com.example.Mangxahoi.constans.enums.PostStatus;
 import com.example.Mangxahoi.dto.response.ImageResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
@@ -16,5 +17,6 @@ import java.util.Date;
 public class PostRequest {
     private String content;
     private ImageRequest imageRequest;
+    private PostStatus status;
     
 }

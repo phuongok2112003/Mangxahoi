@@ -49,6 +49,7 @@ public class PostServiceImpl implements PostService {
                 .createdAt(Instant.now())
                 .updatedAt(Instant.now())
                 .user(userEntity)
+                .status(postRequest.getStatus())
                 .content(postRequest.getContent())
                 .build();
         List<ImageEntity> imageEntities = new ArrayList<>();
@@ -84,6 +85,7 @@ public class PostServiceImpl implements PostService {
         }
         post.setUpdatedAt(Instant.now());
         post.setContent(postRequest.getContent());
+        post.setStatus(postRequest.getStatus());
         if(!imageEntities.isEmpty()){
             imageRepository.saveAll(imageEntities);
         }

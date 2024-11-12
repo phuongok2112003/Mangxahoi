@@ -17,6 +17,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
             "WHERE (f.sender.id = :userId OR f.receiver.id = :userId) " +
             "AND f.status = 'ACCEPTED' " +
             "AND u.id <> :userId " +
+            "AND p.status='PUBLIC'"+
             "ORDER BY p.createdAt DESC")
     List<PostEntity> findPostOfFriend(Long userId);
 
