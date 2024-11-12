@@ -125,7 +125,7 @@ class FriendControllerTest {
                         .build()
         );
 
-        Mockito.when(friendService.getListFriend(id)).thenReturn(friends);
+        Mockito.when(friendService.getListFriend()).thenReturn(friends);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/friendships/accepted/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON))

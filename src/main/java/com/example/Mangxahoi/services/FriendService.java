@@ -10,7 +10,7 @@ public interface FriendService {
     FriendResponse addFriend(Long receiverId);
     FriendResponse responseFriend(Long senderId,  FriendRequest request);
 
-    List<FriendResponse>getListFriend(Long userId);
+    List<FriendResponse>getListFriend();
 
     List<FriendResponse>getListFriendPENDING();
 

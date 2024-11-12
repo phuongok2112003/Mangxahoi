@@ -128,8 +128,6 @@ public class UserServiceTest {
         Otp otp = new Otp();
         otp.setEmail("admin@gmail.com");
         otp.setCode("1234");
-
-
         user.setOtp("123");
         when(userRepository.findByEmail(otp.getEmail())).thenReturn(user);
 

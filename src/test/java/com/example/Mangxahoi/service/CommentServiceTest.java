@@ -1,11 +1,14 @@
 package com.example.Mangxahoi.service;
 
+import com.example.Mangxahoi.constans.MessageCodes;
 import com.example.Mangxahoi.constans.enums.UserRole;
 import com.example.Mangxahoi.dto.request.CommentRequest;
 import com.example.Mangxahoi.dto.response.CommentResponse;
 import com.example.Mangxahoi.entity.CommentEntity;
 import com.example.Mangxahoi.entity.PostEntity;
 import com.example.Mangxahoi.entity.UserEntity;
+import com.example.Mangxahoi.error.CommonStatus;
+import com.example.Mangxahoi.exceptions.EOException;
 import com.example.Mangxahoi.repository.CommentRepository;
 import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.repository.UserRepository;
@@ -13,6 +16,7 @@ import com.example.Mangxahoi.services.Impl.CommentServiceImpl;
 import com.example.Mangxahoi.services.mapper.CommentMapper;
 import com.example.Mangxahoi.utils.SecurityUtils;
 import com.example.Mangxahoi.utils.TokenUtils;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,6 +35,8 @@ import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -50,7 +56,7 @@ public class CommentServiceTest {
 
     @InjectMocks
     private CommentServiceImpl commentService;
-
+    private PostEntity postEntity;
     private CommentEntity commentEntity;
     private CommentResponse commentResponse;
     private CommentRequest commentRequest;
@@ -58,6 +64,13 @@ public class CommentServiceTest {
 
     @BeforeEach
     public void setup() {
+        commentRequest=new CommentRequest();
+        commentRequest.setComment("This is a test comment");
+
+
+        commentResponse=CommentResponse.builder()
+                .comment("This is a test comment")
+                .build();
 
         user=UserEntity.builder()
                 .email("admin@gmail.com")
@@ -69,8 +82,23 @@ public class CommentServiceTest {
                 .build();
         user.setRole(UserRole.USER);
 
+        postEntity = new PostEntity();
+        postEntity.setId(1L);
+        postEntity.setContent("Test post content");
+        postEntity.setUser(user);
 
-        commentRequest.setComment("This is a test comment");
+        postEntity.setCreatedAt(Instant.now());
+        postEntity.setUpdatedAt(Instant.now());
+
+      commentEntity=CommentEntity.builder()
+              .id(1L)
+              .post(postEntity)
+              .user(user)
+              .content("This is a test comment")
+              .updatedAt(Instant.now())
+              .createdAt(Instant.now())
+              .build();
+
     }
 
     // Test for addComment method
@@ -80,8 +108,7 @@ public class CommentServiceTest {
             MockedStatic<CommentMapper> mockedStatic=mockStatic((CommentMapper.class));
             Long postId = 1L;
             String email = "test@example.com";
-            CommentRequest commentRequest = new CommentRequest();
-            commentRequest.setComment("This is a test comment");
+
 
             UserEntity userEntity = new UserEntity();
             userEntity.setEmail(email);
@@ -99,86 +126,89 @@ public class CommentServiceTest {
             when(userRepository.findByEmail(email)).thenReturn(userEntity);
             when(postRepository.findById(postId)).thenReturn(Optional.of(postEntity));
             when(commentRepository.save(any(CommentEntity.class))).thenReturn(commentEntity);
-            mockedStatic.when(()->CommentMapper.entityToResponse(any(CommentEntity.class))).thenReturn(new CommentResponse());
+            mockedStatic.when(()->CommentMapper.entityToResponse(any(CommentEntity.class))).thenReturn(commentResponse);
 
             // When
-            CommentResponse response = commentService.addComment(postId, commentRequest);
+            commentResponse = commentService.addComment(postId, commentRequest);
 
             // Then
-            assertNotNull(response);
-            verify(commentRepository).save(any(CommentEntity.class));
+            assertNotNull(commentResponse);
+            assertEquals("This is a test comment",commentResponse.getComment());
         }
     }
-//    // Test for updateComment method
-//    @Test
-//    void updateComment_ShouldReturnUpdatedCommentResponse_WhenUserIsAuthorized() {
-//        // Given
-//        Long commentId = 1L;
-//        String username = "testUser";
-//        CommentRequest commentRequest = new CommentRequest();
-//        commentRequest.setComment("Updated comment");
-//
-//        CommentEntity commentEntity = new CommentEntity();
-//        UserEntity userEntity = new UserEntity();
-//        userEntity.setUsername(username);
-//        commentEntity.setUser(userEntity);
-//
-//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(commentEntity));
-//        when(SecurityUtils.checkUser(username)).thenReturn(true);
-//        when(CommentMapper.entityToResponse(any(CommentEntity.class))).thenReturn(new CommentResponse());
-//
-//        // When
-//        CommentResponse response = commentService.updateComment(commentId, commentRequest);
-//
-//        // Then
-//        assertNotNull(response);
-//        assertEquals("Updated comment", commentEntity.getContent());
-//        verify(commentRepository).save(commentEntity);
-//    }
-//
-//    // Test for deleteComment method
-//    @Test
-//    void deleteComment_ShouldReturnSuccessMessage_WhenUserIsAuthorized() {
-//        // Given
-//        Long commentId = 1L;
-//        String username = "testUser";
-//
-//        CommentEntity commentEntity = new CommentEntity();
-//        UserEntity userEntity = new UserEntity();
-//        userEntity.setUsername(username);
-//        commentEntity.setUser(userEntity);
-//
-//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(commentEntity));
-//        when(SecurityUtils.checkUser(username)).thenReturn(true);
-//
-//        // When
-//        String result = commentService.deleteComment(commentId);
-//
-//        // Then
-//        assertEquals(MessageCodes.PROCESSED_SUCCESSFULLY, result);
-//        verify(commentRepository).delete(commentEntity);
-//    }
-//
-//    // Test for deleteComment when unauthorized
-//    @Test
-//    void deleteComment_ShouldReturnFailureMessage_WhenUserIsUnauthorized() {
-//        // Given
-//        Long commentId = 1L;
-//        String username = "unauthorizedUser";
-//
-//        CommentEntity commentEntity = new CommentEntity();
-//        UserEntity userEntity = new UserEntity();
-//        userEntity.setUsername("testUser");
-//        commentEntity.setUser(userEntity);
-//
-//        when(commentRepository.findById(commentId)).thenReturn(Optional.of(commentEntity));
-//        when(SecurityUtils.checkUser(username)).thenReturn(false);
-//
-//        // When
-//        String result = commentService.deleteComment(commentId);
-//
-//        // Then
-//        assertEquals(MessageCodes.FAILURE, result);
-//        verify(commentRepository, never()).delete(commentEntity);
-//    }
+    // Test for updateComment method
+    @Test
+    void testAddComment_UserNotFound() {
+        try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
+            String email = "test@example.com";
+            mockedUtils.when(SecurityUtils::getEmail).thenReturn(email);
+        when(userRepository.findByEmail(anyString())).thenReturn(null);
+
+        // Act & Assert
+        EOException exception = assertThrows(EOException.class, () ->
+                commentService.addComment(1L, commentRequest));
+        assertEquals(CommonStatus.ACCOUNT_NOT_FOUND.getMessage(), exception.getMessage());
+    }
+
+    }
+
+    @Test
+    void testUpdateComment_Success() {
+        try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
+            when(commentRepository.findById(anyLong())).thenReturn(Optional.of(commentEntity));
+
+            mockedUtils.when(()->SecurityUtils.checkUser(commentEntity.getUser().getUsername())).thenReturn(true);
+            when(commentRepository.save(any(CommentEntity.class))).thenReturn(commentEntity);
+
+            // Act
+            CommentResponse response = commentService.updateComment(commentEntity.getId(), commentRequest);
+
+            // Assert
+            assertNotNull(response);
+            verify(commentRepository, times(1)).save(any(CommentEntity.class));
+            assertEquals(commentRequest.getComment(), commentEntity.getContent());
+        }
+    }
+    @Test
+    void testUpdateComment_Forbidden() {
+        try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
+            when(commentRepository.findById(anyLong())).thenReturn(Optional.of(commentEntity));
+            mockedUtils.when(()->SecurityUtils.checkUser(commentEntity.getUser().getUsername())).thenReturn(false);
+
+            // Act & Assert
+            EOException exception = assertThrows(EOException.class, () ->
+                    commentService.updateComment(commentEntity.getId(), commentRequest));
+            assertEquals(CommonStatus.FORBIDDEN.getMessage(), exception.getMessage());
+        }
+    }
+    @Test
+    void testDeleteComment_Success() {
+        try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
+            when(commentRepository.findById(anyLong())).thenReturn(Optional.of(commentEntity));
+            mockedUtils.when(()->SecurityUtils.checkUser(commentEntity.getUser().getUsername())).thenReturn(true);
+
+            // Act
+            String response = commentService.deleteComment(commentEntity.getId());
+
+            // Assert
+            assertEquals(MessageCodes.PROCESSED_SUCCESSFULLY, response);
+            verify(commentRepository, times(1)).delete(any(CommentEntity.class));
+        }
+    }
+
+    @Test
+    void testDeleteComment_Failure() {
+        try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
+        when(commentRepository.findById(anyLong())).thenReturn(Optional.of(commentEntity));
+        mockedUtils.when(()->SecurityUtils.checkUser(commentEntity.getUser().getUsername())).thenReturn(false);
+            mockedUtils.when(()->SecurityUtils.checkUser(commentEntity.getPost().getUser().getUsername())).thenReturn(false);
+
+        // Act
+        String response = commentService.deleteComment(commentEntity.getId());
+
+        // Assert
+        assertEquals(MessageCodes.FAILURE, response);
+        verify(commentRepository, never()).delete(any(CommentEntity.class));
+    }
+    }
 }

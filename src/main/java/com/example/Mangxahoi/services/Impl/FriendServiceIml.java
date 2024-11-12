@@ -96,6 +96,7 @@ public class FriendServiceIml implements FriendService {
 
         return FriendResponse.builder()
                 .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
+                .status(friendEntity.getStatus())
                 .sender(UserResponseDto.builder()
                         .id(sender.getId())
                         .aboutMe(sender.getAboutMe())
@@ -108,9 +109,9 @@ public class FriendServiceIml implements FriendService {
     }
 
     @Override
-    public List<FriendResponse> getListFriend(Long userId) {
+    public List<FriendResponse> getListFriend() {
         UserEntity userEntity= SecurityUtils.getCurrentUser();
-        List<UserEntity> friendEntityList = friendRepository.findAllFriendsByUserId(userId);
+        List<UserEntity> friendEntityList = friendRepository.findAllFriendsByUserId(userEntity.getId());
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()
                         .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
@@ -154,6 +155,7 @@ public class FriendServiceIml implements FriendService {
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()
                         .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
+                        .status(FriendshipStatus.REJECTED)
                         .sender(UserResponseDto.builder()
                                 .id(friendEntity.getSender().getId())
                                 .aboutMe(friendEntity.getSender().getAboutMe())

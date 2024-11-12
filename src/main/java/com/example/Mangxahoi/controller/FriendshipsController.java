@@ -28,9 +28,9 @@ public class FriendshipsController {
         return EOResponse.build(friendService.responseFriend(id,request));
     }
 
-    @GetMapping("/accepted/{id}")
-    public EOResponse<List<FriendResponse>> listFriendACCEPTED(@PathVariable Long id) {
-        return EOResponse.build(friendService.getListFriend(id));
+    @GetMapping("/accepted")
+    public EOResponse<List<FriendResponse>> listFriendACCEPTED() {
+        return EOResponse.build(friendService.getListFriend());
     }
     @GetMapping("/pending")
     public EOResponse<List<FriendResponse>> listFriendPENDING() {
