@@ -11,6 +11,7 @@ import com.example.Mangxahoi.entity.PostEntity;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.exceptions.EOException;
+import com.example.Mangxahoi.exceptions.EntityNotFoundException;
 import com.example.Mangxahoi.repository.ImageRepository;
 import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.repository.UserRepository;
@@ -187,11 +188,11 @@ public class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        EOException thrown = assertThrows(EOException.class, () -> {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             postService.updatePost(postId, postRequest, files);
         });
 
-        assertEquals(MessageCodes.ENTITY_NOT_FOUND, thrown.getMessage());
+        assertEquals(MessageCodes.ENTITY_NOT_FOUND, exception.getMessage());
         verify(postRepository, never()).save(any());
     }
 
@@ -216,7 +217,7 @@ public class PostServiceTest {
         when(postRepository.findById(postId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        EOException exception = assertThrows(EOException.class, () -> {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             postService.getPost(postId);
         });
         assertEquals(MessageCodes.ENTITY_NOT_FOUND, exception.getMessage());

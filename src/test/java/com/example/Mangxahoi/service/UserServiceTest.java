@@ -13,6 +13,7 @@ import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.error.UserStatus;
 import com.example.Mangxahoi.exceptions.EOException;
+import com.example.Mangxahoi.exceptions.EntityNotFoundException;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.EmailService;
 import com.example.Mangxahoi.services.Impl.UserServiceImpl;
@@ -168,7 +169,7 @@ public class UserServiceTest {
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        EOException exception = assertThrows(EOException.class, () -> userService.delete(userId));
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, ()  -> userService.delete(userId));
         Assertions.assertEquals(MessageCodes.ENTITY_NOT_FOUND, exception.getMessage());
     }
 

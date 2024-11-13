@@ -67,6 +67,9 @@ public class UserEntity implements UserDetails {
     private List<PostEntity> posts;
 
     @OneToMany(mappedBy = "user")
+    private List<Notification> notifications;
+
+    @OneToMany(mappedBy = "user")
     private List<CommentEntity> comments;
     @OneToMany(mappedBy = "user")
     private List<FavoriteEntity> likes;

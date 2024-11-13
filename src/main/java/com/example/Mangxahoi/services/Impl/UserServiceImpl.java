@@ -15,6 +15,7 @@ import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.error.UserStatus;
 import com.example.Mangxahoi.exceptions.EOException;
+import com.example.Mangxahoi.exceptions.EntityNotFoundException;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.EmailService;
 import com.example.Mangxahoi.services.UserService;
@@ -69,8 +70,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @PostAuthorize("returnObject.username == authentication.name")
     @Override
     public UserResponseDto update(@NonNull Long id, UserRequest dto) {
-        UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
-                MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+        UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
         if(!entity.getUsername().equals(dto.getUsername())){
             this.validateDto(dto);
         }
@@ -83,8 +83,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public String delete(Long id) {
-        UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
-                MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+        UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
           entity.setActive(false);
           userRepository.save(entity);
           return MessageCodes.PROCESSED_SUCCESSFULLY;
@@ -210,8 +209,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserResponseDto getUser(Long id) {
-        UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EOException(ENTITY_NOT_FOUND,
-                MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+        UserEntity entity=userRepository.findById(id).orElseThrow(() ->  new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
         return entityToDto(entity);
     }
 

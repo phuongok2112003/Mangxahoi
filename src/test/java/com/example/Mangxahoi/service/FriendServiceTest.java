@@ -5,11 +5,14 @@ import com.example.Mangxahoi.constans.enums.FriendshipStatus;
 import com.example.Mangxahoi.constans.enums.UserRole;
 import com.example.Mangxahoi.dto.request.FriendRequest;
 import com.example.Mangxahoi.dto.response.FriendResponse;
+import com.example.Mangxahoi.dto.response.PageResponse;
+import com.example.Mangxahoi.dto.response.UserResponseDto;
 import com.example.Mangxahoi.entity.FriendEntity;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.error.UserStatus;
 import com.example.Mangxahoi.exceptions.EOException;
+import com.example.Mangxahoi.exceptions.EntityNotFoundException;
 import com.example.Mangxahoi.repository.FriendRepository;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.DateTimeService;
@@ -24,10 +27,12 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,8 +40,7 @@ import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -58,6 +62,9 @@ public class FriendServiceTest {
     private UserEntity sender;
     private UserEntity receiver;
     FriendEntity friendEntity ;
+    private Pageable pageable;
+    private UserEntity friend1;
+    private UserEntity friend2;
     @BeforeEach
     void setUp() {
         sender=UserEntity.builder()
@@ -86,6 +93,19 @@ public class FriendServiceTest {
         friendEntity.setStatus(FriendshipStatus.PENDING);
         friendEntity.setCreatedAt(Instant.now());
 
+
+        friend1 = new UserEntity();
+        friend1.setId(2L);
+        friend1.setUsername("user1");
+        friend1.setEmail("user1@example.com");
+        friend1.setCreatedAt(Instant.now());
+
+        friend2 = new UserEntity();
+        friend2.setId(3L);
+        friend2.setUsername("user2");
+        friend2.setEmail("user2@example.com");
+        friend2.setCreatedAt(Instant.now());
+        pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
     }
 
     @Test
@@ -178,7 +198,7 @@ public class FriendServiceTest {
 
         when(userRepository.findById(senderId)).thenReturn(Optional.empty());
 
-        EOException exception = assertThrows(EOException.class, () -> {
+        EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             friendService.responseFriend(senderId, request);
         });
 
@@ -189,20 +209,27 @@ public class FriendServiceTest {
     void getListFriend_success() {
 
 
-        UserEntity friend1 = new UserEntity();
-        friend1.setId(2L);
-
-        UserEntity friend2 = new UserEntity();
-        friend2.setId(3L);
-
         try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
             mockedUtils.when(SecurityUtils::getCurrentUser).thenReturn(sender);
 
-        when(friendRepository.findAllFriendsByUserId(1L)).thenReturn(List.of(friend1, friend2));
-        List<FriendResponse> result =  friendService.getListFriend();
+            // Giả lập đầu ra cho findAllFriendsByUserId
+            Page<UserEntity> friendPage = new PageImpl<>(List.of(friend1, friend2), pageable, 2);
+            when(friendRepository.findAllFriendsByUserId(sender.getId(), pageable)).thenReturn(friendPage);
 
-        assertNotNull(result);
-        assertEquals(2, result.size());
+            // Gọi phương thức cần test
+            PageResponse<FriendResponse> result = friendService.getListFriend(1, 5);
+
+            // Kiểm tra kết quả
+            assertEquals(1, result.getCurrentPage());
+            assertEquals(5, result.getPageSize());
+            assertEquals(2, result.getTotalElements());
+            assertEquals(1, result.getTotalPages());
+            assertEquals("user1", result.getData().get(0).getSender().getUsername());
+            assertEquals("user2", result.getData().get(1).getSender().getUsername());
+
+            // Kiểm tra gọi đúng phương thức phụ thuộc
+            verify(friendRepository, times(1)).findAllFriendsByUserId(sender.getId(), pageable);
+            verify(dateTimeService, times(2)).format(any());
     }}
 
     @Test

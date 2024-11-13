@@ -3,22 +3,32 @@ package com.example.Mangxahoi.services.Impl;
 import com.example.Mangxahoi.constans.ErrorCodes;
 import com.example.Mangxahoi.constans.MessageCodes;
 import com.example.Mangxahoi.dto.request.CommentRequest;
+import com.example.Mangxahoi.dto.request.NotificationRequest;
 import com.example.Mangxahoi.dto.response.CommentResponse;
+import com.example.Mangxahoi.dto.response.PageResponse;
 import com.example.Mangxahoi.entity.CommentEntity;
 import com.example.Mangxahoi.entity.PostEntity;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.exceptions.EOException;
+import com.example.Mangxahoi.exceptions.EntityNotFoundException;
 import com.example.Mangxahoi.repository.CommentRepository;
 import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.CommentService;
+import com.example.Mangxahoi.services.NotificationService;
 import com.example.Mangxahoi.services.mapper.CommentMapper;
 import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -26,7 +36,7 @@ public class CommentServiceImpl implements CommentService {
     private final UserRepository userRepository;
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-
+    private final NotificationService notificationService;
     @Override
     public CommentResponse addComment(Long postId,CommentRequest commentRequest) {
         String email = SecurityUtils.getEmail();
@@ -35,8 +45,7 @@ public class CommentServiceImpl implements CommentService {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         }
         PostEntity postEntity = postRepository.findById(postId).orElseThrow(
-                () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND,
-                        MessageCodes.ENTITY_NOT_FOUND, String.valueOf(postId)));
+                () ->  new EntityNotFoundException(PostEntity.class.getName(), "id", postId.toString()));
 
         CommentEntity comment = CommentEntity.builder()
                 .user(userEntity)
@@ -46,7 +55,10 @@ public class CommentServiceImpl implements CommentService {
                 .build();
 
         commentRepository.save(comment);
-
+        notificationService.createNotification(NotificationRequest.builder()
+                .userId(postEntity.getUser().getId())
+                .content(userEntity.getUsername()+" comment in post you ")
+                .build());
         return CommentMapper.entityToResponse(comment);
     }
 
@@ -55,13 +67,16 @@ public class CommentServiceImpl implements CommentService {
     public CommentResponse updateComment(Long id, CommentRequest commentRequest) {
 
         CommentEntity commentEntity=commentRepository.findById(id).orElseThrow(
-                () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND,
-                        MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+                () ->  new EntityNotFoundException(CommentEntity.class.getName(), "id", id.toString()));
         if (SecurityUtils.checkUser(commentEntity.getUser().getUsername())) {
             commentEntity.setContent(commentRequest.getComment());
             commentEntity.setUpdatedAt(Instant.now());
             commentEntity.setCreatedAt(Instant.now());
             commentRepository.save(commentEntity);
+            notificationService.createNotification(NotificationRequest.builder()
+                    .userId(commentEntity.getPost().getUser().getId())
+                    .content(commentEntity.getUser().getUsername()+" update comment in post you ")
+                    .build());
         }else {
             throw new EOException(CommonStatus.FORBIDDEN);
         }
@@ -71,14 +86,30 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public String deleteComment(Long id) {
         CommentEntity commentEntity=commentRepository.findById(id).orElseThrow(
-                () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND,
-                        MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+                () -> new EntityNotFoundException(CommentEntity.class.getName(), "id", id.toString()));
         if (SecurityUtils.checkUser(commentEntity.getUser().getUsername())||
                 SecurityUtils.checkUser(commentEntity.getPost().getUser().getUsername())) {
             commentRepository.delete(commentEntity);
             return  MessageCodes.PROCESSED_SUCCESSFULLY ;
         }
       return  MessageCodes.FAILURE ;
+    }
+
+    @Override
+    public PageResponse<CommentResponse> getAll(Long postId, int page, int size) {
+
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable= PageRequest.of(page-1,size,sort);
+
+        Page<CommentEntity> entityList= commentRepository.findCommentsByPostId(postId,pageable);
+        List<CommentResponse> commentResponses=entityList.stream().map(CommentMapper::entityToResponse).collect(Collectors.toList());
+        return PageResponse.<CommentResponse>builder()
+                .currentPage(page)
+                .pageSize(entityList.getSize())
+                .totalElements(entityList.getTotalElements())
+                .data(commentResponses)
+                .totalPages(entityList.getTotalPages())
+                .build();
     }
 
 

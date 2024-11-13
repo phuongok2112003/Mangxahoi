@@ -71,7 +71,6 @@ public class AuthServiceTest {
         // Given
 
         String username = loginRequest.getUsername();
-        String password = loginRequest.getPassword();
 
 
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))

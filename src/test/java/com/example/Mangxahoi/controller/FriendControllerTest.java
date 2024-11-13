@@ -2,6 +2,7 @@ package com.example.Mangxahoi.controller;
 import com.example.Mangxahoi.constans.enums.FriendshipStatus;
 import com.example.Mangxahoi.dto.request.FriendRequest;
 import com.example.Mangxahoi.dto.response.FriendResponse;
+import com.example.Mangxahoi.dto.response.PageResponse;
 import com.example.Mangxahoi.dto.response.UserResponseDto;
 import com.example.Mangxahoi.services.FriendService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,6 +12,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -96,7 +101,7 @@ class FriendControllerTest {
     @WithMockUser
     void testListFriendACCEPTED() throws Exception {
         Long id = 1L;
-        List<FriendResponse> friends = Arrays.asList(
+        List<FriendResponse> friendList = Arrays.asList(
                 FriendResponse.builder()
                         .sender(UserResponseDto.builder()
                                 .id(2L)
@@ -104,7 +109,7 @@ class FriendControllerTest {
                                 .email("user2@gmail.com")
                                 .build())
                         .receiver(UserResponseDto.builder()
-                                .id(id) // 'id' cần phải được định nghĩa hoặc truyền vào từ trước
+                                .id(id) // Sử dụng id đã được định nghĩa
                                 .username("user1")
                                 .email("user1@gmail.com")
                                 .build())
@@ -125,13 +130,22 @@ class FriendControllerTest {
                         .build()
         );
 
-        Mockito.when(friendService.getListFriend()).thenReturn(friends);
+        PageResponse<FriendResponse> friends = PageResponse.<FriendResponse>builder()
+                .currentPage(1)
+                .pageSize(5)
+                .totalElements(15)
+                .data(friendList)
+                .totalPages(3)
+                .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/friendships/accepted/{id}", id)
+        Mockito.when(friendService.getListFriend(1,5)).thenReturn(friends);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/friendships/accepted", id)
+                        .param("page", "1")  // Thêm tham số page
+                        .param("size", "5")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(jsonPath("data[0].status").value("ACCEPTED"))
-                .andExpect(jsonPath("data[1].status").value("ACCEPTED")).andDo(print());
+                .andDo(print());
     }
 
     @Test

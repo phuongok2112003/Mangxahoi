@@ -5,6 +5,7 @@ import com.example.Mangxahoi.dto.request.CommentRequest;
 import com.example.Mangxahoi.dto.request.FriendRequest;
 import com.example.Mangxahoi.dto.response.CommentResponse;
 import com.example.Mangxahoi.dto.response.FriendResponse;
+import com.example.Mangxahoi.dto.response.PageResponse;
 import com.example.Mangxahoi.services.FriendService;
 import com.example.Mangxahoi.utils.EOResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,8 +30,9 @@ public class FriendshipsController {
     }
 
     @GetMapping("/accepted")
-    public EOResponse<List<FriendResponse>> listFriendACCEPTED() {
-        return EOResponse.build(friendService.getListFriend());
+    public EOResponse<PageResponse<FriendResponse>> listFriendACCEPTED(@RequestParam(value = "page", required = false, defaultValue = "1") int page,
+                                                                       @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        return EOResponse.build(friendService.getListFriend(page,size));
     }
     @GetMapping("/pending")
     public EOResponse<List<FriendResponse>> listFriendPENDING() {

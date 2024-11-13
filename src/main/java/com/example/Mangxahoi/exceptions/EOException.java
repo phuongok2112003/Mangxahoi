@@ -1,7 +1,7 @@
 package com.example.Mangxahoi.exceptions;
 
 import com.example.Mangxahoi.error.ErrorStatus;
-import com.example.Mangxahoi.utils.I18n;
+import com.example.Mangxahoi.utils.EbsI18n;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.http.HttpStatus;
@@ -17,18 +17,18 @@ public class EOException extends RuntimeException{
     public EOException(HttpStatus httpStatus, String messageUrl, @Nullable String value, Object... arg) {
         this.code = httpStatus.value();
         this.value = value;
-        this.message = I18n.get(messageUrl, arg);
+        this.message = EbsI18n.get(messageUrl, arg);
     }
 
     public EOException(int code, String messageUrl, @Nullable String value, Object... arg) {
         this.code = code;
         this.value = value;
-        this.message = I18n.get(messageUrl, arg);
+        this.message = EbsI18n.get(messageUrl, arg);
     }
 
     public EOException(ErrorStatus enumError, Object... arg) {
         this.code = enumError.getCode();
         this.value = null;
-        this.message = I18n.get(enumError.getMessage(), arg);
+        this.message = EbsI18n.get(enumError.getMessage(), arg);
     }
 }

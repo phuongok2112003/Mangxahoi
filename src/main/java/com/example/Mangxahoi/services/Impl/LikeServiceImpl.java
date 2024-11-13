@@ -8,6 +8,7 @@ import com.example.Mangxahoi.entity.PostEntity;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.exceptions.EOException;
+import com.example.Mangxahoi.exceptions.EntityNotFoundException;
 import com.example.Mangxahoi.repository.LikeRepository;
 import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.repository.UserRepository;
@@ -33,8 +34,7 @@ public class LikeServiceImpl implements LikeService {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         }
         PostEntity postEntity = postRepository.findById(postId).orElseThrow(
-                () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND,
-                        MessageCodes.ENTITY_NOT_FOUND, String.valueOf(postId)));
+                () ->  new EntityNotFoundException(PostEntity.class.getName(), "id", postId.toString()));
         FavoriteEntity favoriteEntity= FavoriteEntity.builder()
                 .post(postEntity)
                 .user(userEntity)
@@ -50,8 +50,7 @@ public class LikeServiceImpl implements LikeService {
     public String unLike(Long id) {
 
         FavoriteEntity favoriteEntity=likeRepository.findById(id).orElseThrow(
-                () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND,
-                        MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+                () ->  new EntityNotFoundException(FavoriteEntity.class.getName(), "id", id.toString()));
         if (SecurityUtils.checkUser(favoriteEntity.getUser().getUsername())) {
             likeRepository.delete(favoriteEntity);
         }else {

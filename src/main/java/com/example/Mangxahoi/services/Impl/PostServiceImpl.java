@@ -8,6 +8,7 @@ import com.example.Mangxahoi.entity.PostEntity;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
 import com.example.Mangxahoi.exceptions.EOException;
+import com.example.Mangxahoi.exceptions.EntityNotFoundException;
 import com.example.Mangxahoi.repository.ImageRepository;
 import com.example.Mangxahoi.repository.PostRepository;
 import com.example.Mangxahoi.repository.UserRepository;
@@ -34,7 +35,6 @@ public class PostServiceImpl implements PostService {
     private final ImageService imageService;
     private final UserRepository userRepository;
     private final PostRepository postRepository;
-    private final DateTimeService dateTimeService;
     private final ImageRepository imageRepository;
 
     @Override
@@ -71,14 +71,14 @@ public class PostServiceImpl implements PostService {
     public PostResponse updatePost(@NonNull Long id,@NonNull PostRequest postRequest, MultipartFile[] files) {
 
         PostEntity post=postRepository.findById(id).orElseThrow(
-                () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+                () ->  new EntityNotFoundException(PostEntity.class.getName(), "id", id.toString()));
         List<ImageEntity> imageEntities = new ArrayList<>();
         List<ImageResponse> imageResponseList=new ArrayList<>();
         if(files!=null){
             imageResponseList = imageService.uploadImage(files);
             postRequest.getImageRequest().getUrl().forEach(imageService::deleteImage);
             List<ImageEntity> image=imageRepository.findByUrlAll(postRequest.getImageRequest().getUrl());
-//            List<ImageEntity> image=imageRepository.findByPost(post.getId());
+
             if(!image.isEmpty())
                 imageRepository.deleteAll(image);
             saveImage(imageEntities,imageResponseList,files,post);
@@ -97,7 +97,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostResponse getPost(Long id) {
         PostEntity post=postRepository.findById(id).orElseThrow(
-                () -> new EOException(ErrorCodes.ENTITY_NOT_FOUND, MessageCodes.ENTITY_NOT_FOUND, String.valueOf(id)));
+                () -> new EntityNotFoundException(PostEntity.class.getName(), "id", id.toString()));
 
         return PostMapper.entiyToResponse(post);
     }

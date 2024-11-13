@@ -11,6 +11,7 @@ public class UserMapper {
         }
         UserResponseDto dto = new UserResponseDto();
         dto.setUsername(entity.getUsername());
+        dto.setId(entity.getId());
         dto.setEmail(entity.getEmail());
         dto.setGender(entity.getGender());
         dto.setOccupation(entity.getOccupation());
