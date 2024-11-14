@@ -15,7 +15,5 @@ public interface FriendService {
 
     List<FriendResponse>getListFriendPENDING();
 
-    List<FriendResponse> rejected();
-
 
 }

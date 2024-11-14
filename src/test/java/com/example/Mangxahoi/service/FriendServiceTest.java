@@ -94,17 +94,25 @@ public class FriendServiceTest {
         friendEntity.setCreatedAt(Instant.now());
 
 
-        friend1 = new UserEntity();
-        friend1.setId(2L);
-        friend1.setUsername("user1");
-        friend1.setEmail("user1@example.com");
-        friend1.setCreatedAt(Instant.now());
+        friend1 = UserEntity.builder()
+                .email("user3@gmail.com")
+                .username("user3")
+                .dateBirth(LocalDate.parse("2003-11-02"))
+                .id(3L)
+                .gender(true)
+                .password(bCryptPasswordEncoder.encode("1234"))
+                .build();
+        friend1.setRole(UserRole.USER);
 
-        friend2 = new UserEntity();
-        friend2.setId(3L);
-        friend2.setUsername("user2");
-        friend2.setEmail("user2@example.com");
-        friend2.setCreatedAt(Instant.now());
+        friend2 = UserEntity.builder()
+                .email("user4@gmail.com")
+                .username("user4")
+                .dateBirth(LocalDate.parse("2003-11-02"))
+                .id(4L)
+                .gender(true)
+                .password(bCryptPasswordEncoder.encode("1234"))
+                .build();
+        friend1.setRole(UserRole.USER);
         pageable = PageRequest.of(0, 5, Sort.by("createdAt").descending());
     }
 
@@ -212,9 +220,9 @@ public class FriendServiceTest {
         try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
             mockedUtils.when(SecurityUtils::getCurrentUser).thenReturn(sender);
 
-            // Giả lập đầu ra cho findAllFriendsByUserId
+
             Page<UserEntity> friendPage = new PageImpl<>(List.of(friend1, friend2), pageable, 2);
-            when(friendRepository.findAllFriendsByUserId(sender.getId(), pageable)).thenReturn(friendPage);
+            when(friendRepository.findAllFriendsByUserId(anyLong(), any(Pageable.class))).thenReturn(friendPage);
 
             // Gọi phương thức cần test
             PageResponse<FriendResponse> result = friendService.getListFriend(1, 5);
@@ -224,8 +232,8 @@ public class FriendServiceTest {
             assertEquals(5, result.getPageSize());
             assertEquals(2, result.getTotalElements());
             assertEquals(1, result.getTotalPages());
-            assertEquals("user1", result.getData().get(0).getSender().getUsername());
-            assertEquals("user2", result.getData().get(1).getSender().getUsername());
+            assertEquals("user3", result.getData().get(0).getSender().getUsername());
+            assertEquals("user4", result.getData().get(1).getSender().getUsername());
 
             // Kiểm tra gọi đúng phương thức phụ thuộc
             verify(friendRepository, times(1)).findAllFriendsByUserId(sender.getId(), pageable);
@@ -252,22 +260,5 @@ public class FriendServiceTest {
             assertEquals(FriendshipStatus.PENDING, result.get(0).getStatus());
         }
     }
-    @Test
-    void rejected_success() {
-        try (MockedStatic<SecurityUtils> mockedUtils = mockStatic(SecurityUtils.class)) {
 
-        FriendEntity rejectedFriend = new FriendEntity();
-        rejectedFriend.setStatus(FriendshipStatus.REJECTED);
-        rejectedFriend.setSender(sender);
-
-        mockedUtils.when(SecurityUtils::getCurrentUser).thenReturn(receiver);
-        when(friendRepository.findAllFriendsREJECTEDByUserId(receiver.getId())).thenReturn(List.of(rejectedFriend));
-
-
-        List<FriendResponse> result = friendService.rejected();
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        assertEquals(FriendshipStatus.REJECTED, result.get(0).getStatus());
-    }}
 }

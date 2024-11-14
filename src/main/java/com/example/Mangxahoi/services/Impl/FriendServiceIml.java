@@ -105,18 +105,24 @@ public class FriendServiceIml implements FriendService {
             throw new EOException(ENTITY_NOT_FOUND, MessageCodes.ACC_NOT_SEND_ADD_FRIEND, senderId.toString());
         }
 
-        friendEntity.setStatus(request.getStatus());
+        if(request.getStatus()==FriendshipStatus.REJECTED){
+            friendRepository.delete(friendEntity);
+        }
+        else  {
+            friendEntity.setStatus(request.getStatus());
 
-        notificationService.createNotification(NotificationRequest.builder()
-                        .userId(senderId)
-                        .content(userCurr.getUsername()+"response is "+request.getStatus())
-                .build());
+            notificationService.createNotification(NotificationRequest.builder()
+                    .userId(senderId)
+                    .content(userCurr.getUsername() + " response is " + request.getStatus())
+                    .build());
+            friendEntity.setCreatedAt(Instant.now());
 
-        friendRepository.save(friendEntity);
-
+            friendRepository.save(friendEntity);
+        }
         return FriendResponse.builder()
                 .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
                 .status(friendEntity.getStatus())
+                .id(friendEntity.getId())
                 .sender(UserResponseDto.builder()
                         .id(sender.getId())
                         .aboutMe(sender.getAboutMe())
@@ -131,12 +137,13 @@ public class FriendServiceIml implements FriendService {
     @Override
     public PageResponse<FriendResponse> getListFriend(int page, int size) {
         UserEntity userEntity= SecurityUtils.getCurrentUser();
-        Sort sort = Sort.by("createdDate").descending();
+        Sort sort = Sort.by("createdAt").descending();
         Pageable pageable= PageRequest.of(page-1,size,sort);
         Page<UserEntity> friendEntityList = friendRepository.findAllFriendsByUserId(userEntity.getId(),pageable);
         List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
                 FriendResponse.builder()
                         .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
+                        .id(friendEntity.getId())
                         .sender(UserResponseDto.builder()
                                 .id(friendEntity.getId())
                                 .aboutMe(friendEntity.getAboutMe())
@@ -164,6 +171,7 @@ public class FriendServiceIml implements FriendService {
                 FriendResponse.builder()
                         .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
                         .status(friendEntity.getStatus())
+                        .id(friendEntity.getId())
                         .sender(UserResponseDto.builder()
                                 .id(friendEntity.getSender().getId())
                                 .aboutMe(friendEntity.getSender().getAboutMe())
@@ -177,24 +185,4 @@ public class FriendServiceIml implements FriendService {
         return friendResponses;
     }
 
-    @Override
-    public List<FriendResponse> rejected() {
-        UserEntity userEntity= SecurityUtils.getCurrentUser();
-        List<FriendEntity> friendEntityList = friendRepository.findAllFriendsREJECTEDByUserId(userEntity.getId());
-        List<FriendResponse> friendResponses = friendEntityList.stream().map(friendEntity ->
-                FriendResponse.builder()
-                        .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
-                        .status(FriendshipStatus.REJECTED)
-                        .sender(UserResponseDto.builder()
-                                .id(friendEntity.getSender().getId())
-                                .aboutMe(friendEntity.getSender().getAboutMe())
-                                .email(friendEntity.getSender().getEmail())
-                                .gender(friendEntity.getSender().getGender())
-                                .location(friendEntity.getSender().getLocation())
-                                .occupation(friendEntity.getSender().getOccupation())
-                                .username(friendEntity.getSender().getUsername())
-                                .build()).build()
-        ).toList();
-        return friendResponses;
-    }
 }

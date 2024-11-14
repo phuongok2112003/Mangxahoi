@@ -20,11 +20,16 @@ import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
 
@@ -103,14 +108,23 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<PostResponse> getPostOfFriend() {
+    public PageResponse<PostResponse> getPostOfFriend(int page,int size) {
         UserEntity userEntity= SecurityUtils.getCurrentUser();
-        List<PostEntity> list=postRepository.findPostOfFriend(userEntity.getId());
+        Sort sort = Sort.by("createdAt").descending();
+        Pageable pageable= PageRequest.of(page-1,size,sort);
+        Page<PostEntity> list=postRepository.findPostOfFriend(userEntity.getId(),pageable);
         if(list.isEmpty()){
             throw new EOException(ENTITY_NOT_FOUND,
                     MessageCodes.NOT_POST, String.valueOf(userEntity.getId()));
         }
-        return list.stream().map(PostMapper::entiyToResponse).toList();
+        List<PostResponse>responseList= list.stream().map(PostMapper::entiyToResponse).toList();
+        return PageResponse.<PostResponse>builder()
+                .currentPage(page)
+                .pageSize(list.getSize())
+                .totalElements(list.getTotalElements())
+                .data(responseList)
+                .totalPages(list.getTotalPages())
+                .build();
     }
 
     public void saveImage(  List<ImageEntity> imageEntities, List<ImageResponse> imageResponseList,MultipartFile[] files,PostEntity post){

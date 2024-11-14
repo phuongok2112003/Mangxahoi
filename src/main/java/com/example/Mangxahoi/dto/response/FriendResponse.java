@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class FriendResponse {
+    Long id;
     UserResponseDto sender;
     UserResponseDto receiver;
     FriendshipStatus status;

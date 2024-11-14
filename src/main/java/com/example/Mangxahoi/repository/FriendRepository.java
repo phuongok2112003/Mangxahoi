@@ -30,9 +30,6 @@ public interface FriendRepository extends JpaRepository<FriendEntity,Long> {
             "AND i.status =PENDING")
     List<FriendEntity> findAllFriendsPENDINGByUserId(@Param("userid") Long userid);
 
-    @Query("SELECT i FROM FriendEntity i WHERE i.receiver.id = :userid " +
-            "AND i.status =REJECTED")
-    List<FriendEntity> findAllFriendsREJECTEDByUserId(@Param("userid") Long userid);
 
     @Query("SELECT COUNT(f) FROM FriendEntity f WHERE f.status = 'ACCEPTED'" +
             " AND (f.sender.id = :userId OR f.receiver.id = :userId) " +

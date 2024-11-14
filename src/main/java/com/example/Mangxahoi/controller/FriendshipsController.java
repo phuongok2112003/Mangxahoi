@@ -38,9 +38,6 @@ public class FriendshipsController {
     public EOResponse<List<FriendResponse>> listFriendPENDING() {
         return EOResponse.build(friendService.getListFriendPENDING());
     }
-    @GetMapping("/rejected")
-    public EOResponse<List<FriendResponse>> friendREJECTED() {
-        return EOResponse.build(friendService.rejected());
-    }
+
 
 }

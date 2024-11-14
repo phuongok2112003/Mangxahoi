@@ -92,7 +92,22 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public TokenDto getToken(Otp otp) {
         UserEntity user =  userRepository.findByEmail(otp.getEmail());
+
+
+
+        UserEntity entity=userRepository.findByEmail(otp.getEmail());
+        if(entity==null){
+
+        }else {
+            Map<String, Object> claims = TokenUtils.verifyToken(entity.getOtp());
+            String email = claims.get("email").toString();
+            Long otp =(Long) claims.get("id");
+        }
+
+
         if(user.getOtp().equals(otp.getCode())){
+
+
             String accessToken = TokenUtils.createAccessToken(user);
             String refreshToken = TokenUtils.createRefreshToken(user.getEmail());
 

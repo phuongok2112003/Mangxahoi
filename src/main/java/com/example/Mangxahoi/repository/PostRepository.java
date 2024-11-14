@@ -1,6 +1,8 @@
 package com.example.Mangxahoi.repository;
 
 import com.example.Mangxahoi.entity.PostEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +21,7 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
             "AND u.id <> :userId " +
             "AND p.status='PUBLIC'"+
             "ORDER BY p.createdAt DESC")
-    List<PostEntity> findPostOfFriend(Long userId);
+    Page<PostEntity> findPostOfFriend(Long userId, Pageable pageable);
 
     long countByUserIdAndCreatedAtBetween(Long userId, Instant startOfWeek, Instant endOfWeek);
 }

@@ -31,5 +31,6 @@ public class FriendEntity {
 
     @Column(name = "created_at")
     private Instant createdAt;
+
 }
 

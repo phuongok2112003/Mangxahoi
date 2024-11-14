@@ -11,6 +11,7 @@ import com.example.Mangxahoi.services.AuthService;
 
 import com.example.Mangxahoi.utils.RenderCodeTest;
 
+import com.example.Mangxahoi.utils.TokenUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -39,7 +40,7 @@ public class AuthServiceImpl implements AuthService {
                     .code( RenderCodeTest.setValue())
                     .email(user.getEmail())
                     .build();
-            user.setOtp(otp.getCode());
+            user.setOtp(TokenUtils.createCode(otp.getCode(),username));
             userRepository.save(user);
             return otp;
         } catch (AuthenticationException e) {

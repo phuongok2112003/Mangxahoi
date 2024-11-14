@@ -1,6 +1,7 @@
 package com.example.Mangxahoi.controller;
 
 import com.example.Mangxahoi.services.ReportService;
+import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -27,7 +28,7 @@ public class ReportController {
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
-            headers.setContentDispositionFormData("attachment", "weekly_report.xlsx");
+            headers.setContentDispositionFormData("attachment", "weekly_report of "+SecurityUtils.getCurrentUser().getUsername()+".xlsx");
             headers.setContentLength(reportData.length);
 
             return new ResponseEntity<>(reportData, headers, HttpStatus.OK);

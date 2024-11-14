@@ -1,6 +1,7 @@
 package com.example.Mangxahoi.controller;
 
 import com.example.Mangxahoi.dto.request.PostRequest;
+import com.example.Mangxahoi.dto.response.PageResponse;
 import com.example.Mangxahoi.dto.response.PostResponse;
 import com.example.Mangxahoi.services.PostService;
 import com.example.Mangxahoi.utils.EOResponse;
@@ -39,7 +40,9 @@ public class PostController {
     }
 
     @GetMapping("/post-of-friend")
-    public  EOResponse<List<PostResponse>> getPostOfFriend() {
-        return EOResponse.build(postService.getPostOfFriend());
+    public  EOResponse<PageResponse<PostResponse>> getPostOfFriend(
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        return EOResponse.build(postService.getPostOfFriend(page,size));
     }
 }

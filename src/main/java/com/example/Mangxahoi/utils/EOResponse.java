@@ -25,7 +25,7 @@ public class EOResponse<T> {
 
     private T data;
 
-    private int total;
+
 
     public EOResponse (){
     }
@@ -41,10 +41,6 @@ public class EOResponse<T> {
         EOResponse<T> response = new EOResponse<>();
         response.data = data;
         response.code = HttpStatus.OK.value();
-
-        if (data instanceof Collection) {
-            response.total = ((Collection) data).size();
-        }
 
         return response;
     }
