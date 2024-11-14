@@ -1,6 +1,10 @@
 package com.example.Mangxahoi.services.Impl;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.Mangxahoi.constans.MessageCodes;
 import com.example.Mangxahoi.constans.enums.UserRole;
 import com.example.Mangxahoi.dto.Otp;
@@ -13,18 +17,22 @@ import com.example.Mangxahoi.dto.response.EmailResponse;
 import com.example.Mangxahoi.dto.response.UserResponseDto;
 import com.example.Mangxahoi.entity.UserEntity;
 import com.example.Mangxahoi.error.CommonStatus;
+import com.example.Mangxahoi.error.DataError;
 import com.example.Mangxahoi.error.UserStatus;
 import com.example.Mangxahoi.exceptions.EOException;
 import com.example.Mangxahoi.exceptions.EntityNotFoundException;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.EmailService;
 import com.example.Mangxahoi.services.UserService;
+import com.example.Mangxahoi.utils.ConvertUtils;
 import com.example.Mangxahoi.utils.TokenUtils;
 import com.example.Mangxahoi.utils.RenderCodeTest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.authentication.ProviderNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -43,6 +51,7 @@ import java.util.Map;
 import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
 
 import static com.example.Mangxahoi.constans.ErrorCodes.ERROR_CODE;
+import static com.example.Mangxahoi.constans.enums.Variables.SECRET_KEY;
 import static com.example.Mangxahoi.services.mapper.UserMapper.entityToDto;
 
 
@@ -93,27 +102,35 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     public TokenDto getToken(Otp otp) {
         UserEntity user =  userRepository.findByEmail(otp.getEmail());
 
-
-
         UserEntity entity=userRepository.findByEmail(otp.getEmail());
         if(entity==null){
-
+            throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         }else {
-            Map<String, Object> claims = TokenUtils.verifyToken(entity.getOtp());
-            String email = claims.get("email").toString();
-            Long otp =(Long) claims.get("id");
+            try{
+
+            Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
+
+            JWTVerifier verifier = JWT.require(algorithm).build();
+
+            DecodedJWT decodedJWT = verifier.verify(entity.getOtp());
+
+           String email= decodedJWT.getSubject();
+           String code = decodedJWT.getClaim("code").asString();
+            if(code.equals(otp.getCode())&&email.equals(entity.getEmail())){
+                String accessToken = TokenUtils.createAccessToken(user);
+                String refreshToken = TokenUtils.createRefreshToken(user.getEmail());
+
+                return new TokenDto(accessToken, refreshToken);
+            }
+         } catch (TokenExpiredException ex) {
+
+          throw new EOException(CommonStatus.TokenExpired);
+
+            }
+            throw new EOException(UserStatus.WRONG_OTP);
+
         }
 
-
-        if(user.getOtp().equals(otp.getCode())){
-
-
-            String accessToken = TokenUtils.createAccessToken(user);
-            String refreshToken = TokenUtils.createRefreshToken(user.getEmail());
-
-            return new TokenDto(accessToken, refreshToken);
-        }
-       throw new EOException(UserStatus.WRONG_OTP);
 
     }
 

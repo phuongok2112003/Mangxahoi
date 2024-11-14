@@ -1,5 +1,8 @@
 package com.example.Mangxahoi.exceptions;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.example.Mangxahoi.error.CommonStatus;
+import com.example.Mangxahoi.error.DataError;
 import com.example.Mangxahoi.utils.EOResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +27,7 @@ public class ExceptionHandler {
     protected ResponseEntity<Object> handleException(EOException ex) {
         log.error("Handle Exception. code = {}, message = {}", ex.code, ex.getMessage());
         ApiMessageError error = new ApiMessageError(ex.getMessage(), ex.value);
-        return ResponseEntity.status(500).body(EOResponse.buildMsg(ex.code, ex.message, error));
+        return ResponseEntity.status(ex.code).body(EOResponse.buildMsg(ex.code, ex.message, error));
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler({Exception.class})
@@ -46,8 +49,9 @@ public class ExceptionHandler {
     protected ResponseEntity<Object> handleEntityNotFound(AccessDeniedException ex) {
         log.error("Handle Exception: errorMessage = {}", ex.getMessage(), ex);
         ApiMessageError error = new ApiMessageError(ex.getMessage(), null);
-        return ResponseEntity.status(403).body(EOResponse.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), "errors.access is denied", error, new Object[0]));
+        return ResponseEntity.status(403).body(DataError.build(CommonStatus.FORBIDDEN));
     }
+
     @org.springframework.web.bind.annotation.ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, String>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();

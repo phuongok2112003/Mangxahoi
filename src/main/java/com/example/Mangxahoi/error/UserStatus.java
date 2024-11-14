@@ -4,11 +4,8 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum UserStatus implements ErrorStatus {
-    TOKEN_IS_EXPIRED(400, "errors.token_is_expired"),
-    IS_NOT_TOKEN(400, "errors.this_is_not_token"),
 
-    CONFIRM_PASSWORD_IS_ERROR(400, "errors.confirm_password_is_error"),
-    EMAIL_IS_EXIST(430_005, "errors.email_is_exist"),
+    EMAIL_IS_EXIST(400, "errors.email_is_exist"),
     SENDED_FRIEND(400, "errors.user_sended_friend"),
     USERNAME_IS_EMPTY(400, "errors.username_is_empty"),
     EMAIL_IS_EMPTY(400, "errors.email_is_empty"),
