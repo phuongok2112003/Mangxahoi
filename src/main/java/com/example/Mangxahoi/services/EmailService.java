@@ -5,8 +5,6 @@ import com.example.Mangxahoi.dto.request.SendEmailRequest;
 import com.example.Mangxahoi.dto.request.Sender;
 import com.example.Mangxahoi.dto.response.EmailResponse;
 import com.example.Mangxahoi.error.CommonStatus;
-import com.example.Mangxahoi.error.DataError;
-import com.example.Mangxahoi.error.ErrorStatus;
 import com.example.Mangxahoi.exceptions.EOException;
 import com.example.Mangxahoi.repository.httpClient.EmailClient;
 import feign.FeignException;
