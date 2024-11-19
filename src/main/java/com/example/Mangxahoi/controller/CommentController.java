@@ -26,9 +26,9 @@ public class CommentController {
     public EOResponse<CommentResponse> addComment(@PathVariable Long postId,@RequestBody CommentRequest commentRequest) {
         return EOResponse.build(commentService.addComment( postId,commentRequest));
     }
-    @PutMapping("/{postId}")
-    public EOResponse<CommentResponse> updateComment(@PathVariable Long postId,@RequestBody CommentRequest commentRequest) {
-        return EOResponse.build(commentService.updateComment( postId,commentRequest));
+    @PutMapping("/{commentId}")
+    public EOResponse<CommentResponse> updateComment(@PathVariable Long commentId,@RequestBody CommentRequest commentRequest) {
+        return EOResponse.build(commentService.updateComment( commentId,commentRequest));
     }
     @GetMapping("/{postId}")
     public EOResponse<PageResponse<CommentResponse>> getCommentsByPostId(
@@ -37,8 +37,8 @@ public class CommentController {
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         return EOResponse.build(commentService.getAll(postId, page, size));
     }
-    @DeleteMapping("/{postId}")
-    public EOResponse<String> deleteComment(@PathVariable Long postId) {
-        return EOResponse.build(commentService.deleteComment( postId));
+    @DeleteMapping("/{commentId}")
+    public EOResponse<String> deleteComment(@PathVariable Long commentId) {
+        return EOResponse.build(commentService.deleteComment( commentId));
     }
 }

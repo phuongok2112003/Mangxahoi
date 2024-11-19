@@ -16,12 +16,13 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
     @Query("SELECT p FROM PostEntity p " +
             "JOIN p.user u " +
             "JOIN FriendEntity f ON (f.sender = u OR f.receiver = u) " +
-            "WHERE (f.sender.id = :userId OR f.receiver.id = :userId) " +
-            "AND f.status = 'ACCEPTED' " +
-            "AND u.id <> :userId " +
-            "AND p.status='PUBLIC'"+
-            "ORDER BY p.createdAt DESC")
+            "WHERE (((f.sender.id = :userId OR f.receiver.id = :userId) " +
+            "AND f.status = 'ACCEPTED') " +
+            "OR u.id = :userId )" +
+            "AND p.status='PUBLIC'")
     Page<PostEntity> findPostOfFriend(Long userId, Pageable pageable);
+
+    Page<PostEntity> findByUserId(Long userId,Pageable pageable);
 
     long countByUserIdAndCreatedAtBetween(Long userId, Instant startOfWeek, Instant endOfWeek);
 }

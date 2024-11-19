@@ -3,6 +3,7 @@ import com.example.Mangxahoi.constans.ErrorCodes;
 import com.example.Mangxahoi.constans.MessageCodes;
 import com.example.Mangxahoi.dto.request.PostRequest;
 import com.example.Mangxahoi.dto.response.*;
+import com.example.Mangxahoi.entity.CommentEntity;
 import com.example.Mangxahoi.entity.ImageEntity;
 import com.example.Mangxahoi.entity.PostEntity;
 import com.example.Mangxahoi.entity.UserEntity;
@@ -110,7 +111,7 @@ public class PostServiceImpl implements PostService {
     @Override
     public PageResponse<PostResponse> getPostOfFriend(int page,int size) {
         UserEntity userEntity= SecurityUtils.getCurrentUser();
-        Sort sort = Sort.by("createdAt").descending();
+        Sort sort = Sort.by("createdAt").ascending();
         Pageable pageable= PageRequest.of(page-1,size,sort);
         Page<PostEntity> list=postRepository.findPostOfFriend(userEntity.getId(),pageable);
         if(list.isEmpty()){
@@ -125,6 +126,39 @@ public class PostServiceImpl implements PostService {
                 .data(responseList)
                 .totalPages(list.getTotalPages())
                 .build();
+    }
+
+    @Override
+    public PageResponse<PostResponse> getPost(Long userId,int page, int size) {
+
+        Sort sort = Sort.by("createdAt").ascending();
+        Pageable pageable= PageRequest.of(page-1,size,sort);
+        Page<PostEntity> list=postRepository.findByUserId(userId,pageable);
+        if(list.isEmpty()){
+            throw new EOException(ENTITY_NOT_FOUND,
+                    MessageCodes.NOT_POST, String.valueOf(userId));
+        }
+        List<PostResponse>responseList= list.stream().map(PostMapper::entiyToResponse).toList();
+        return PageResponse.<PostResponse>builder()
+                .currentPage(page)
+                .pageSize(list.getSize())
+                .totalElements(list.getTotalElements())
+                .data(responseList)
+                .totalPages(list.getTotalPages())
+                .build();
+    }
+
+    @Override
+    public String deletePost(Long id) {
+
+        PostEntity post=postRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException(PostEntity.class.getName(), "id", id.toString()));
+        if (SecurityUtils.checkUser(post.getUser().getUsername())) {
+            postRepository.delete(post);
+            return  MessageCodes.PROCESSED_SUCCESSFULLY ;
+        }
+        return  MessageCodes.FAILURE ;
+
     }
 
     public void saveImage(  List<ImageEntity> imageEntities, List<ImageResponse> imageResponseList,MultipartFile[] files,PostEntity post){

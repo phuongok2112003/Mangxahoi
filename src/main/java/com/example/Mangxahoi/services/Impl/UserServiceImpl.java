@@ -32,6 +32,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.authentication.ProviderNotFoundException;
@@ -61,7 +62,8 @@ import static com.example.Mangxahoi.services.mapper.UserMapper.entityToDto;
 public class UserServiceImpl implements UserService, UserDetailsService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
-    private final EmailService emailService;;
+    private final EmailService emailService;
+    private final RedisTemplate<Object,Object> template;
 
     @Override
     public UserResponseDto register(UserRequest dto) {
@@ -100,7 +102,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public TokenDto getToken(Otp otp) {
-        UserEntity user =  userRepository.findByEmail(otp.getEmail());
+
 
         UserEntity entity=userRepository.findByEmail(otp.getEmail());
         if(entity==null){
@@ -116,15 +118,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
            String email= decodedJWT.getSubject();
            String code = decodedJWT.getClaim("code").asString();
-            if(code.equals(otp.getCode())&&email.equals(entity.getEmail())){
-                String accessToken = TokenUtils.createAccessToken(user);
-                String refreshToken = TokenUtils.createRefreshToken(user.getEmail());
+
+           int time= (int) template.opsForValue().get(email);
+
+           if(time<5){
+               entity.setOtp("");
+               userRepository.save(entity);
+               throw new EOException(CommonStatus.ACCOUNT_LOG_TOO);
+           }
+
+           template.opsForValue().set(email,time+1);
+
+            if(code.equals(otp.getOtp())&&email.equals(entity.getEmail())){
+                String accessToken = TokenUtils.createAccessToken(entity);
+                String refreshToken = TokenUtils.createRefreshToken(entity.getEmail());
 
                 return new TokenDto(accessToken, refreshToken);
             }
          } catch (TokenExpiredException ex) {
 
-          throw new EOException(CommonStatus.TokenExpired);
+          throw new EOException(CommonStatus.OtpExpired);
 
             }
             throw new EOException(UserStatus.WRONG_OTP);

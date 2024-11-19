@@ -18,4 +18,7 @@ public interface PostService {
   PostResponse getPost(Long id);
 
   PageResponse<PostResponse> getPostOfFriend(int page,int size);
+
+  PageResponse<PostResponse> getPost(Long userId,int page,int size);
+  String deletePost(Long id);
 }

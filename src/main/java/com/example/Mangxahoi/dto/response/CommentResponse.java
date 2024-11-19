@@ -15,6 +15,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Builder
 public class CommentResponse {
+    private Long id;
     private String username;
     private String comment;
     private Long postId;

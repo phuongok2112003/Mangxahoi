@@ -45,4 +45,17 @@ public class PostController {
             @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
         return EOResponse.build(postService.getPostOfFriend(page,size));
     }
+
+    @GetMapping("/user/{userId}")
+    public  EOResponse<PageResponse<PostResponse>> getPostByUserId(
+            @PathVariable Long userId,
+            @RequestParam(value = "page", required = false, defaultValue = "1") int page,
+            @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        return EOResponse.build(postService.getPost(userId,page,size));
+    }
+
+    @DeleteMapping("/{postId}")
+    public EOResponse<String> deleteComment(@PathVariable Long postId) {
+        return EOResponse.build(postService.deletePost( postId));
+    }
 }

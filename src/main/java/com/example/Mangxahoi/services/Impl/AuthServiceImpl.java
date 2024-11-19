@@ -13,19 +13,20 @@ import com.example.Mangxahoi.utils.RenderCodeTest;
 
 import com.example.Mangxahoi.utils.TokenUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Caching;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
+    private final RedisTemplate<Object,Object> template;
     @Override
     public Otp login(LoginRequest loginRequest)  {
         try {
@@ -37,10 +38,11 @@ public class AuthServiceImpl implements AuthService {
             UserEntity user = (UserEntity) authentication.getPrincipal();
 
             Otp otp= Otp.builder()
-                    .code( RenderCodeTest.setValue())
+                    .otp( RenderCodeTest.setValue())
                     .email(user.getEmail())
                     .build();
-            user.setOtp(TokenUtils.createCode(otp.getCode(),username));
+            user.setOtp(TokenUtils.createCode(otp.getOtp(),username));
+            template.opsForValue().set(otp.getEmail(),0);
             userRepository.save(user);
             return otp;
         } catch (AuthenticationException e) {
@@ -54,4 +56,6 @@ public class AuthServiceImpl implements AuthService {
         throw new EOException((CommonStatus.ACCOUNT_NOT_FOUND));
 
     }
+
+
 }

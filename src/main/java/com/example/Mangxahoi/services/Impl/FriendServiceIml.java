@@ -121,7 +121,7 @@ public class FriendServiceIml implements FriendService {
         }
         return FriendResponse.builder()
                 .createdAt(dateTimeService.format(friendEntity.getCreatedAt()))
-                .status(friendEntity.getStatus())
+                .status(request.getStatus())
                 .id(friendEntity.getId())
                 .sender(UserResponseDto.builder()
                         .id(sender.getId())

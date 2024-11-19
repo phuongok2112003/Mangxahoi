@@ -27,7 +27,7 @@ public class ExceptionHandler {
     protected ResponseEntity<Object> handleException(EOException ex) {
         log.error("Handle Exception. code = {}, message = {}", ex.code, ex.getMessage());
         ApiMessageError error = new ApiMessageError(ex.getMessage(), ex.value);
-        return ResponseEntity.status(ex.code).body(EOResponse.buildMsg(ex.code, ex.message, error));
+        return ResponseEntity.status(500).body(EOResponse.buildMsg(ex.code, ex.message, error));
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler({Exception.class})

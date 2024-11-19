@@ -12,6 +12,7 @@ public class CommentMapper {
 
     public static CommentResponse entityToResponse(CommentEntity commentEntity){
         return   CommentResponse.builder()
+                .id(commentEntity.getId())
                 .comment(commentEntity.getContent())
                 .postId(commentEntity.getPost().getId())
                 .createdAt(dateTimeService.format(commentEntity.getCreatedAt()))

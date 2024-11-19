@@ -1,5 +1,6 @@
 package com.example.Mangxahoi.utils;
 
+import com.example.Mangxahoi.constans.MessageCodes;
 import com.example.Mangxahoi.exceptions.ApiSubError;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
@@ -40,6 +41,7 @@ public class EOResponse<T> {
     public static <T> EOResponse<T> build (T data){
         EOResponse<T> response = new EOResponse<>();
         response.data = data;
+        response.message= MessageCodes.PROCESSED_SUCCESSFULLY;
         response.code = HttpStatus.OK.value();
 
         return response;
