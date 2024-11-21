@@ -1,6 +1,8 @@
 package com.example.Mangxahoi.services.Impl;
 import com.example.Mangxahoi.constans.ErrorCodes;
 import com.example.Mangxahoi.constans.MessageCodes;
+import com.example.Mangxahoi.constans.enums.PostStatus;
+import com.example.Mangxahoi.dto.request.ImageRequest;
 import com.example.Mangxahoi.dto.request.PostRequest;
 import com.example.Mangxahoi.dto.response.*;
 import com.example.Mangxahoi.entity.CommentEntity;
@@ -25,6 +27,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
@@ -33,6 +36,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
+import static com.example.Mangxahoi.constans.ErrorCodes.ERROR_CODE;
 
 @Service
 @AllArgsConstructor
@@ -44,7 +48,7 @@ public class PostServiceImpl implements PostService {
     private final ImageRepository imageRepository;
 
     @Override
-    public PostResponse createPost(  PostRequest postRequest, MultipartFile[] files)  {
+    public PostResponse createPost(  PostRequest postRequest)  {
 
         String email = SecurityUtils.getEmail();
         UserEntity userEntity = userRepository.findByEmail(email);
@@ -59,11 +63,9 @@ public class PostServiceImpl implements PostService {
                 .content(postRequest.getContent())
                 .build();
         List<ImageEntity> imageEntities = new ArrayList<>();
-        List<ImageResponse> imageResponseList=new ArrayList<>();
-        if(files!=null){
-            imageResponseList = imageService.uploadImage(files);
-            saveImage(imageEntities,imageResponseList,post);
-        }
+
+        saveImage(imageEntities,postRequest.getImageRequest(),post);
+
         post.setImages(imageEntities);
         postRepository.save(post);
         if(!imageEntities.isEmpty()){
@@ -74,21 +76,15 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostResponse updatePost(@NonNull Long id,@NonNull PostRequest postRequest, MultipartFile[] files) {
+    public PostResponse updatePost(@NonNull Long id,@NonNull PostRequest postRequest) {
 
         PostEntity post=postRepository.findById(id).orElseThrow(
                 () ->  new EntityNotFoundException(PostEntity.class.getName(), "id", id.toString()));
         List<ImageEntity> imageEntities = new ArrayList<>();
-        List<ImageResponse> imageResponseList=new ArrayList<>();
-        if(files!=null){
-            imageResponseList = imageService.uploadImage(files);
-            postRequest.getImageRequest().getUrl().forEach(imageService::deleteImage);
-            List<ImageEntity> image=imageRepository.findByUrlAll(postRequest.getImageRequest().getUrl());
 
-            if(!image.isEmpty())
-                imageRepository.deleteAll(image);
-            saveImage(imageEntities,imageResponseList,post);
-        }
+
+        saveImage(imageEntities,postRequest.getImageRequest(),post);
+
         post.setUpdatedAt(Instant.now());
         post.setContent(postRequest.getContent());
         post.setStatus(postRequest.getStatus());
@@ -105,7 +101,11 @@ public class PostServiceImpl implements PostService {
         PostEntity post=postRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException(PostEntity.class.getName(), "id", id.toString()));
 
-        return PostMapper.entiyToResponse(post);
+        if(!SecurityUtils.checkUser(post.getUser().getUsername())&&post.getStatus().equals(PostStatus.PRIVATE)){
+            throw new EOException(CommonStatus.FORBIDDEN);
+        }else {
+            return PostMapper.entiyToResponse(post);
+        }
     }
 
     @Override
@@ -161,13 +161,22 @@ public class PostServiceImpl implements PostService {
 
     }
 
-    public void saveImage(  List<ImageEntity> imageEntities, List<ImageResponse> imageResponseList,PostEntity post){
+    public void saveImage(List<ImageEntity> imageEntities, ImageRequest imageRequest, PostEntity post){
 
-        for (ImageResponse imageResponse : imageResponseList) {
+        for (String url : imageRequest.getUrl()
+        ) {
+            if (url == null || !(url.equals(MediaType.IMAGE_JPEG_VALUE) ||
+                    url.equals(MediaType.IMAGE_PNG_VALUE) ||
+                    url.equals(MediaType.IMAGE_GIF_VALUE))) {
+                throw new EOException(ERROR_CODE,
+                        MessageCodes.FILE_UPLOAD_NOT_FORMAT, url);
+            }
+
+
             ImageEntity imageEntity = ImageEntity.builder()
                     .createdAt(Instant.now())
                     .createdAt(Instant.now())
-                    .url(imageResponse.getUrl())
+                    .url(url)
                     .post(post)
                     .build();
             imageEntities.add(imageEntity);

@@ -136,7 +136,7 @@ public class PostServiceTest {
             when(postRepository.save(any(PostEntity.class))).thenReturn(postEntity);
 
             // Act
-            PostResponse response = postService.createPost(postRequest, files);
+            PostResponse response = postService.createPost(postRequest);
 
             // Assert
             assertNotNull(response);
@@ -155,7 +155,7 @@ public class PostServiceTest {
 
             // Act & Assert
             EOException exception = assertThrows(EOException.class, () -> {
-                postService.createPost(postRequest, files);
+                postService.createPost(postRequest);
             });
             Assertions.assertEquals(CommonStatus.ACCOUNT_NOT_FOUND.getMessage(), exception.getMessage());
         }
@@ -171,7 +171,7 @@ public class PostServiceTest {
 
         when(imageRepository.findByUrlAll(postRequest.getImageRequest().getUrl())).thenReturn(image);
         when(imageService.uploadImage(files)).thenReturn(responseList);
-        PostResponse response = postService.updatePost(postId, postRequest, files);
+        PostResponse response = postService.updatePost(postId, postRequest);
 
         // Assert
         assertNotNull(response);
@@ -189,7 +189,7 @@ public class PostServiceTest {
 
         // Act & Assert
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            postService.updatePost(postId, postRequest, files);
+            postService.updatePost(postId, postRequest);
         });
 
         assertEquals(MessageCodes.ENTITY_NOT_FOUND, exception.getMessage());

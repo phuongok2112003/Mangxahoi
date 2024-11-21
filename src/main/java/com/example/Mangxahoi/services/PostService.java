@@ -11,9 +11,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface PostService {
-  PostResponse createPost( PostRequest postRequest , MultipartFile[] files) throws JsonProcessingException;
+  PostResponse createPost( PostRequest postRequest ) ;
 
-  PostResponse updatePost( Long id,PostRequest postRequest, MultipartFile[] files);
+  PostResponse updatePost( Long id,PostRequest postRequest);
 
   PostResponse getPost(Long id);
 

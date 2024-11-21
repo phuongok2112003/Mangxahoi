@@ -1,7 +1,6 @@
 package com.example.Mangxahoi.exceptions;
 
 import com.example.Mangxahoi.error.CommonStatus;
-import com.example.Mangxahoi.error.DataError;
 import com.example.Mangxahoi.utils.EOResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,18 +9,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 @ControllerAdvice
 public class ExceptionHandler {
     private static final Logger log = LoggerFactory.getLogger(ExceptionHandler.class);
-    public ExceptionHandler() {
-    }
 
     @org.springframework.web.bind.annotation.ExceptionHandler({EOException.class})
     protected ResponseEntity<Object> handleException(EOException ex) {

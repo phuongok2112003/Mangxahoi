@@ -12,8 +12,6 @@ public enum CommonStatus implements ErrorStatus {
     ACCOUNT_NOT_FOUND(400, "errors.account_not_found"),
     ACCOUNT_LOG_TOO(400, "errors.Your account has logged in too many times"),
     PASSWORD_NOT_CONFIRM(400,"errors.password_not_confirm"),
-
-    WRONG_USERNAME_OR_PASSWORD(400, "errors.wrong_username_or_password"),
     CANNOT_SEND_EMAIL(400, "errors.cant_sent_email"),
 
     ;

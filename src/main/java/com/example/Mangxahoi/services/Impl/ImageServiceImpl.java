@@ -64,7 +64,7 @@ public class ImageServiceImpl implements ImageService {
                 String filename = isValidation(fileNameImage, IMAGE_UPLOAD_DIR + "/post-image/");
                 Path path = Paths.get(IMAGE_UPLOAD_DIR + "/post-image/" + filename);
                 Files.write(path, file.getBytes());
-                uploadFIleReponseDto.setUrl("/post-image/" + filename);
+                uploadFIleReponseDto.setUrl("post-image/" + filename);
                 list.add(uploadFIleReponseDto);
 
             } catch (IOException e) {
@@ -94,7 +94,7 @@ public class ImageServiceImpl implements ImageService {
     @Override
     public byte[] getImage(String filename) {
         try {
-            Path path = Paths.get(IMAGE_UPLOAD_DIR + filename);
+            Path path = Paths.get(IMAGE_UPLOAD_DIR +"/"+ filename);
             byte[] image = Files.readAllBytes(path);
             return image;
         } catch (IOException e) {

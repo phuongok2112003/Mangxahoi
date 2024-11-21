@@ -56,7 +56,7 @@ public class PostControllerTest {
                 "application/json", objectMapper.writeValueAsString(postRequest).getBytes());
         MockMultipartFile file1 = new MockMultipartFile("files", "image1.jpg",
                 MediaType.IMAGE_JPEG_VALUE, "image data".getBytes());
-        Mockito.when(postService.createPost(any(PostRequest.class), any(MultipartFile[].class))).thenReturn(postResponse);
+        Mockito.when(postService.createPost(any(PostRequest.class))).thenReturn(postResponse);
 
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/post/create-post")
@@ -114,7 +114,7 @@ public class PostControllerTest {
         MockMultipartFile postRequestPart = new MockMultipartFile("PostRequest", "", "application/json", objectMapper.writeValueAsString(postRequest).getBytes());
         MockMultipartFile file1 = new MockMultipartFile("files", "image1.jpg", MediaType.IMAGE_JPEG_VALUE, "image data".getBytes());
 
-        Mockito.when(postService.updatePost(eq(postId), any(PostRequest.class), any(MultipartFile[].class))).thenReturn(postResponse);
+        Mockito.when(postService.updatePost(eq(postId), any(PostRequest.class))).thenReturn(postResponse);
 
 
         mockMvc.perform(MockMvcRequestBuilders.multipart("/post/{id}", postId)

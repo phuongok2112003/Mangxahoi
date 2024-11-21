@@ -21,22 +21,20 @@ import java.util.List;
 @Slf4j
 public class PostController {
     private final PostService postService;
-    @PostMapping(value = "/create-post",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public EOResponse<PostResponse> createPost( @RequestPart("PostRequest") String postDto,
-                                                @RequestPart(value="files",required = false) MultipartFile[] files) throws JsonProcessingException {
+    @PostMapping(value = "/create-post")
+    public EOResponse<PostResponse> createPost(@RequestBody PostRequest postDto) {
 
-        PostRequest postRequest=  ConvertUtils.toObject(postDto,PostRequest.class);
-            return EOResponse.build(postService.createPost(postRequest, files));
+
+            return EOResponse.build(postService.createPost(postDto));
     }
     @GetMapping("/{id}")
     public  EOResponse<PostResponse> getPost( @PathVariable Long id) {
         return EOResponse.build(postService.getPost(id));
     }
-    @PatchMapping(value = "/{id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public  EOResponse<PostResponse> updatePost( @PathVariable Long id,@RequestPart("PostRequest") String postDto,
-                                                @RequestPart(value="files",required = false) MultipartFile[] files) throws JsonProcessingException {
-        PostRequest postRequest=  ConvertUtils.toObject(postDto,PostRequest.class);
-        return EOResponse.build(postService.updatePost(id,postRequest,files));
+    @PatchMapping(value = "/{id}")
+    public  EOResponse<PostResponse> updatePost( @PathVariable Long id,@RequestBody PostRequest postDto) {
+
+        return EOResponse.build(postService.updatePost(id,postDto));
     }
 
     @GetMapping("/post-of-friend")

@@ -8,9 +8,7 @@ public enum UserStatus implements ErrorStatus {
     EMAIL_IS_EXIST(400, "errors.email_is_exist"),
     SENDED_FRIEND(400, "errors.user_sended_friend"),
     USERNAME_IS_EMPTY(400, "errors.username_is_empty"),
-    EMAIL_IS_EMPTY(400, "errors.email_is_empty"),
     PASSWORD_IS_EMPTY(400, "errors.password_is_empty"),
-    EMAIL_NOT_FOUND(400, "errors.email_not_found"),
   WRONG_OTP(400,"errors.user_wrong_otp"),
     ;
 

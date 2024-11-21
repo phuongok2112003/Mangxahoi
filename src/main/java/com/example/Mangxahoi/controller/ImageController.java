@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -31,9 +33,9 @@ public class ImageController {
 
         return EOResponse.build(imageService.uploadAvatar(files));
     }
-    @GetMapping("/avatar-image/{filename}")
-    public ResponseEntity<byte[]> getImageAvatar(@PathVariable String filename) throws IOException {
-        byte[] imgBytes = imageService.getImage("/avatar-image/" + filename);
+    @GetMapping("/{action}/{filename}")
+    public ResponseEntity<byte[]> getImageAvatar(@PathVariable String action,@PathVariable String filename) throws IOException {
+        byte[] imgBytes = imageService.getImage(action+"/"+filename);
 
         if (imgBytes != null) {
 
@@ -46,19 +48,7 @@ public class ImageController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    @GetMapping("/post-image/{filename}")
-    public ResponseEntity<byte[]> getImage(@PathVariable String filename) {
-        byte[] imgBytes=imageService.getImage("/post-image/"+filename);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(MediaType.IMAGE_JPEG_VALUE));
-        headers.setContentDisposition(ContentDisposition.inline().filename(filename).build());
-        if(imgBytes!=null)
-            return ResponseEntity.ok().headers(headers).body(imgBytes);
-        else{
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
 
-    }
 
 
 }

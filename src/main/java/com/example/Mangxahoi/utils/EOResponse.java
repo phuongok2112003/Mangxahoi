@@ -6,10 +6,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -60,7 +58,7 @@ public class EOResponse<T> {
     }
 
     public static <T> EOResponse<T> buildMsg(int code, String message) {
-        EOResponse<T> response = new EOResponse();
+        EOResponse<T> response = new EOResponse<>();
         response.code = code;
         response.message = message;
         return response;
