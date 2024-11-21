@@ -1,4 +1,5 @@
 package com.example.Mangxahoi.services.Impl;
+
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -63,7 +64,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final UserRepository userRepository;
     private final EmailService emailService;
-    private final RedisTemplate<Object,Object> template;
+    private final RedisTemplate<Object, Object> template;
 
     @Override
     public UserResponseDto register(UserRequest dto) {
@@ -73,19 +74,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new EOException(UserStatus.PASSWORD_IS_EMPTY);
         }
         UserEntity user = new UserEntity();
-        dtoToEntiy(dto,user);
+        dtoToEntiy(dto, user);
         user.setRole(UserRole.USER);
         user = userRepository.save(user);
         return entityToDto(user);
     }
+
     @PostAuthorize("returnObject.username == authentication.name")
     @Override
     public UserResponseDto update(@NonNull Long id, UserRequest dto) {
-        UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
-        if(!entity.getUsername().equals(dto.getUsername())){
+        UserEntity entity = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
+        if (!entity.getUsername().equals(dto.getUsername())) {
             this.validateDto(dto);
         }
-        dtoToEntiy(dto,entity);
+        dtoToEntiy(dto, entity);
         entity.setActive(dto.isActive());
         entity.setUpdatedAt(Instant.now());
         userRepository.save(entity);
@@ -94,50 +96,49 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public String delete(Long id) {
-        UserEntity entity=userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
-          entity.setActive(false);
-          userRepository.save(entity);
-          return MessageCodes.PROCESSED_SUCCESSFULLY;
+        UserEntity entity = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
+        entity.setActive(false);
+        userRepository.save(entity);
+        return MessageCodes.PROCESSED_SUCCESSFULLY;
     }
 
     @Override
     public TokenDto getToken(Otp otp) {
 
 
-        UserEntity entity=userRepository.findByEmail(otp.getEmail());
-        if(entity==null){
+        UserEntity entity = userRepository.findByEmail(otp.getEmail());
+        if (entity == null) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
-        }else {
-            try{
+        } else {
+            try {
+                int time = (int) template.opsForValue().get(otp.getEmail());
 
-            Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
+                if (time > 4) {
+                    entity.setOtp("");
+                    userRepository.save(entity);
+                    throw new EOException(CommonStatus.ACCOUNT_LOG_TOO);
+                }
+                Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
 
-            JWTVerifier verifier = JWT.require(algorithm).build();
+                JWTVerifier verifier = JWT.require(algorithm).build();
 
-            DecodedJWT decodedJWT = verifier.verify(entity.getOtp());
+                DecodedJWT decodedJWT = verifier.verify(entity.getOtp());
 
-           String email= decodedJWT.getSubject();
-           String code = decodedJWT.getClaim("code").asString();
+                String email = decodedJWT.getSubject();
+                String code = decodedJWT.getClaim("code").asString();
 
-           int time= (int) template.opsForValue().get(email);
 
-           if(time<5){
-               entity.setOtp("");
-               userRepository.save(entity);
-               throw new EOException(CommonStatus.ACCOUNT_LOG_TOO);
-           }
+                template.opsForValue().set(email, time + 1);
 
-           template.opsForValue().set(email,time+1);
+                if (code.equals(otp.getOtp()) && email.equals(entity.getEmail())) {
+                    String accessToken = TokenUtils.createAccessToken(entity);
+                    String refreshToken = TokenUtils.createRefreshToken(entity.getEmail());
 
-            if(code.equals(otp.getOtp())&&email.equals(entity.getEmail())){
-                String accessToken = TokenUtils.createAccessToken(entity);
-                String refreshToken = TokenUtils.createRefreshToken(entity.getEmail());
+                    return new TokenDto(accessToken, refreshToken);
+                }
+            } catch (TokenExpiredException ex) {
 
-                return new TokenDto(accessToken, refreshToken);
-            }
-         } catch (TokenExpiredException ex) {
-
-          throw new EOException(CommonStatus.OtpExpired);
+                throw new EOException(CommonStatus.OtpExpired);
 
             }
             throw new EOException(UserStatus.WRONG_OTP);
@@ -152,7 +153,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new EOException(UserStatus.USERNAME_IS_EMPTY);
         }
 
-        if (userRepository.findByEmail(dto.getEmail())!=null) {
+        if (userRepository.findByEmail(dto.getEmail()) != null) {
             throw new EOException(UserStatus.EMAIL_IS_EXIST);
         }
     }
@@ -167,7 +168,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public TokenDto refreshToken(String refreshToken)  {
+    public TokenDto refreshToken(String refreshToken) {
         Map<String, Object> claims = TokenUtils.verifyToken(refreshToken);
         String email = claims.get("email").toString();
         UserEntity user = userRepository.findByEmail(email);
@@ -177,19 +178,19 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         }
 
         String accessToken = TokenUtils.createAccessToken(user);
-        refreshToken=TokenUtils.createRefreshToken(user.getEmail());
+        refreshToken = TokenUtils.createRefreshToken(user.getEmail());
         return new TokenDto(accessToken, refreshToken);
     }
 
     @Override
     public EmailResponse sendPasswordResetCode(String email) {
-        String code= RenderCodeTest.setValue();
-        UserEntity user=userRepository.findByEmail(email);
-        if(user==null){
+        String code = RenderCodeTest.setValue();
+        UserEntity user = userRepository.findByEmail(email);
+        if (user == null) {
             throw new EOException(ENTITY_NOT_FOUND,
                     MessageCodes.EMAIL_NOT_FOUND, String.valueOf(email));
         }
-        String token=  TokenUtils.createCode(code,email);
+        String token = TokenUtils.createCode(code, email);
         user.setOtp(token);
         userRepository.save(user);
 
@@ -216,37 +217,35 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    public String verifyPasswordResetCode(String token,PasswordResetRequest passwordResetRequest) {
+    public String verifyPasswordResetCode(String token, PasswordResetRequest passwordResetRequest) {
 
-        if(passwordResetRequest==null||token==null){
+        if (passwordResetRequest == null || token == null) {
             throw new EOException(CommonStatus.PASSWORD_NOT_CONFIRM);
         }
 
-        try{
+        try {
             Map<String, Object> claims = TokenUtils.verifyToken(token);
             String email = claims.get("email").toString();
             UserEntity user = userRepository.findByEmail(email);
-            if(user==null){
+            if (user == null) {
                 throw new EOException(ENTITY_NOT_FOUND,
                         MessageCodes.EMAIL_NOT_FOUND, String.valueOf(email));
             }
 
 
-            String pasword1=passwordResetRequest.getPassword();
-            String pasword2=passwordResetRequest.getPassword2();
-            if(token.equals(user.getOtp())&&pasword1.equals(pasword2)){
+            String pasword1 = passwordResetRequest.getPassword();
+            String pasword2 = passwordResetRequest.getPassword2();
+            if (token.equals(user.getOtp()) && pasword1.equals(pasword2)) {
                 user.setPassword(bCryptPasswordEncoder.encode(pasword1));
                 userRepository.save(user);
                 return MessageCodes.PROCESSED_SUCCESSFULLY;
-            }
-            else{
+            } else {
                 throw new EOException(ERROR_CODE,
-                        MessageCodes.USER_NOT_VERIFY,email);
+                        MessageCodes.USER_NOT_VERIFY, email);
             }
-        }catch (TokenExpiredException ex){
+        } catch (TokenExpiredException ex) {
             throw new EOException(CommonStatus.TokenExpired);
-        }
-        catch (JWTVerificationException ex){
+        } catch (JWTVerificationException ex) {
             throw new EOException(CommonStatus.TokenIsInvalid);
         }
 
@@ -254,11 +253,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserResponseDto getUser(Long id) {
-        UserEntity entity=userRepository.findById(id).orElseThrow(() ->  new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
+        UserEntity entity = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
         return entityToDto(entity);
     }
 
-    private  void dtoToEntiy(UserRequest userRequestDto, UserEntity userEntity) {
+    private void dtoToEntiy(UserRequest userRequestDto, UserEntity userEntity) {
         userEntity.setUsername(userRequestDto.getUsername());
         userEntity.setEmail(userRequestDto.getEmail());
         userEntity.setRole(userRequestDto.getRole());

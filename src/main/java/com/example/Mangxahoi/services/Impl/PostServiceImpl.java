@@ -62,7 +62,7 @@ public class PostServiceImpl implements PostService {
         List<ImageResponse> imageResponseList=new ArrayList<>();
         if(files!=null){
             imageResponseList = imageService.uploadImage(files);
-            saveImage(imageEntities,imageResponseList,files,post);
+            saveImage(imageEntities,imageResponseList,post);
         }
         post.setImages(imageEntities);
         postRepository.save(post);
@@ -87,7 +87,7 @@ public class PostServiceImpl implements PostService {
 
             if(!image.isEmpty())
                 imageRepository.deleteAll(image);
-            saveImage(imageEntities,imageResponseList,files,post);
+            saveImage(imageEntities,imageResponseList,post);
         }
         post.setUpdatedAt(Instant.now());
         post.setContent(postRequest.getContent());
@@ -161,7 +161,7 @@ public class PostServiceImpl implements PostService {
 
     }
 
-    public void saveImage(  List<ImageEntity> imageEntities, List<ImageResponse> imageResponseList,MultipartFile[] files,PostEntity post){
+    public void saveImage(  List<ImageEntity> imageEntities, List<ImageResponse> imageResponseList,PostEntity post){
 
         for (ImageResponse imageResponse : imageResponseList) {
             ImageEntity imageEntity = ImageEntity.builder()
