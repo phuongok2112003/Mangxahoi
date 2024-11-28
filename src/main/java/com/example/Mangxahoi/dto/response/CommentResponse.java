@@ -2,6 +2,7 @@ package com.example.Mangxahoi.dto.response;
 
 import com.example.Mangxahoi.dto.request.PostRequest;
 import com.example.Mangxahoi.dto.request.UserRequest;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -14,6 +15,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class CommentResponse {
     private Long id;
     private String username;

@@ -2,6 +2,7 @@ package com.example.Mangxahoi.dto.response;
 
 import com.example.Mangxahoi.constans.enums.UserRole;
 import com.example.Mangxahoi.repository.LikeRepository;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.time.Instant;
@@ -14,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseDto {
     private Long id;
     private String username;
