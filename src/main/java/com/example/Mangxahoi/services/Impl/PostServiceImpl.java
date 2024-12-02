@@ -161,27 +161,28 @@ public class PostServiceImpl implements PostService {
 
     }
 
-    public void saveImage(List<ImageEntity> imageEntities, ImageRequest imageRequest, PostEntity post){
+    public void saveImage(List<ImageEntity> imageEntities, ImageRequest imageRequest, PostEntity post) {
 
-        for (String url : imageRequest.getUrl()
-        ) {
-            if (url == null || !(url.equals(MediaType.IMAGE_JPEG_VALUE) ||
-                    url.equals(MediaType.IMAGE_PNG_VALUE) ||
-                    url.equals(MediaType.IMAGE_GIF_VALUE))) {
-                throw new EOException(ERROR_CODE,
-                        MessageCodes.FILE_UPLOAD_NOT_FORMAT, url);
+        // Duyệt qua từng URL trong yêu cầu
+        for (String url : imageRequest.getUrl()) {
+            if (url == null ||
+                    !(url.toLowerCase().endsWith(".jpeg") ||
+                            url.toLowerCase().endsWith(".jpg") ||
+                            url.toLowerCase().endsWith(".png") ||
+                            url.toLowerCase().endsWith(".gif"))) {
+                throw new EOException(ERROR_CODE, MessageCodes.FILE_UPLOAD_NOT_FORMAT, url);
             }
 
-
+            // Tạo đối tượng ImageEntity và thêm vào danh sách
             ImageEntity imageEntity = ImageEntity.builder()
-                    .createdAt(Instant.now())
-                    .createdAt(Instant.now())
+                    .createdAt(Instant.now())  // Sử dụng đúng tên phương thức để thiết lập ngày giờ
                     .url(url)
                     .post(post)
                     .build();
             imageEntities.add(imageEntity);
         }
     }
+
 
 
 
