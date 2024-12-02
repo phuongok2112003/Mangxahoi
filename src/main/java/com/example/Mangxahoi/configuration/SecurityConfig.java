@@ -26,7 +26,6 @@ import java.util.List;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
 public class SecurityConfig {
 
     @Value("${endpoints.cors.allowed-headers: Authorization, Content-Type}")
@@ -46,15 +45,18 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final UserService userService;
-    private final UserRepository userRepository;
+
     private static final String[] PUBLIC_URLS = {
             "/v3/api-docs/**",
             "/swagger-ui/**",
             "/swagger-ui.html",
             "/api/auth/**",
             "/authenticate",
-            "/user/**",
+            "/user/register",
+            "/user/get-token",
+            "/user/forgot",
+            "/user/reset-password",
+            "/user/reset-password",
             "/api/login",
             "/image/avatar-image/**",
             "/image/post-image/**"
@@ -66,12 +68,11 @@ public class SecurityConfig {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.POST,PUBLIC_URLS).permitAll()
-                        .requestMatchers(HttpMethod.GET,PUBLIC_URLS).permitAll()
+                        .requestMatchers(PUBLIC_URLS).permitAll()
                         .anyRequest().authenticated());
 
 
-        http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new CustomAuthorizationFilter(PUBLIC_URLS), UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();

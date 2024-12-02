@@ -19,7 +19,6 @@ public class EOResponse<T> {
             pattern ="yyyy-MM-dd'T'HH:mm:ss"
     )
     private LocalDateTime timestamp = LocalDateTime.now();
-    private int code;
     private String message;
 
     private T data;
@@ -29,9 +28,8 @@ public class EOResponse<T> {
     public EOResponse (){
     }
 
-    public static <T> EOResponse<T> build(int code, String messageUrl, Object...args){
+    public static <T> EOResponse<T> build( String messageUrl, Object...args){
         EOResponse<T> response = new EOResponse<>();
-        response.code = code;
         response.message = messageUrl;
         return  response;
     }
@@ -40,7 +38,7 @@ public class EOResponse<T> {
         EOResponse<T> response = new EOResponse<>();
         response.data = data;
         response.message= MessageCodes.PROCESSED_SUCCESSFULLY;
-        response.code = HttpStatus.OK.value();
+
 
         return response;
     }
@@ -59,7 +57,6 @@ public class EOResponse<T> {
 
     public static <T> EOResponse<T> buildMsg(int code, String message) {
         EOResponse<T> response = new EOResponse<>();
-        response.code = code;
         response.message = message;
         return response;
     }

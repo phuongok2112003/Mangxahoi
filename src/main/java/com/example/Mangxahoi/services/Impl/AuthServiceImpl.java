@@ -20,12 +20,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
-    private final UserRepository userRepository;
+
     private final RedisTemplate<Object,Object> template;
     @Override
     public Otp login(LoginRequest loginRequest)  {
@@ -41,9 +43,9 @@ public class AuthServiceImpl implements AuthService {
                     .otp( RenderCodeTest.setValue())
                     .email(user.getEmail())
                     .build();
-            user.setOtp(TokenUtils.createCode(otp.getOtp(),username));
-            template.opsForValue().set(otp.getEmail(),0);
-            userRepository.save(user);
+
+            template.opsForValue().set(otp.getEmail(), otp, 5, TimeUnit.MINUTES);
+
             return otp;
         } catch (AuthenticationException e) {
            hasException(e);

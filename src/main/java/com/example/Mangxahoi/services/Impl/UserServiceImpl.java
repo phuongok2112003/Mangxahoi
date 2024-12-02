@@ -1,11 +1,6 @@
 package com.example.Mangxahoi.services.Impl;
-
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.Mangxahoi.constans.MessageCodes;
 import com.example.Mangxahoi.constans.enums.UserRole;
 import com.example.Mangxahoi.dto.Otp;
@@ -24,6 +19,7 @@ import com.example.Mangxahoi.exceptions.EntityNotFoundException;
 import com.example.Mangxahoi.repository.UserRepository;
 import com.example.Mangxahoi.services.EmailService;
 import com.example.Mangxahoi.services.UserService;
+import com.example.Mangxahoi.utils.SecurityUtils;
 import com.example.Mangxahoi.utils.TokenUtils;
 import com.example.Mangxahoi.utils.RenderCodeTest;
 import lombok.NonNull;
@@ -32,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.authentication.ProviderNotFoundException;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,16 +36,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.io.IOException;
 import java.time.Instant;
 import java.util.Map;
-
+import java.util.concurrent.TimeUnit;
 
 import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
-
 import static com.example.Mangxahoi.constans.ErrorCodes.ERROR_CODE;
-import static com.example.Mangxahoi.constans.enums.Variables.SECRET_KEY;
 import static com.example.Mangxahoi.services.mapper.UserMapper.entityToDto;
 
 
@@ -63,7 +56,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public UserResponseDto register(UserRequest dto) {
-        dto.setUsername(dto.getUsername());
+
         this.validateDto(dto);
         if (!StringUtils.hasText(dto.getPassword())) {
             throw new EOException(UserStatus.PASSWORD_IS_EMPTY);
@@ -79,7 +72,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     @Override
     public UserResponseDto update(@NonNull Long id, UserRequest dto) {
         UserEntity entity = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
-        if (!entity.getUsername().equals(dto.getUsername())) {
+        if (!entity.getUsername().equals(dto.getEmail())) {
             this.validateDto(dto);
         }
         dtoToEntiy(dto, entity);
@@ -105,37 +98,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         if (entity == null) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         } else {
-            try {
-                int time = (int) template.opsForValue().get(otp.getEmail());
 
-                if (time > 4) {
-                    entity.setOtp("");
-                    userRepository.save(entity);
-                    throw new EOException(CommonStatus.ACCOUNT_LOG_TOO);
+                Otp codeOTP = (Otp) template.opsForValue().get(otp.getEmail());
+
+                if (codeOTP==null) {
+
+                    throw new EOException(CommonStatus.ACCOUNT_NOT_OTP);
                 }
-                Algorithm algorithm = Algorithm.HMAC256(SECRET_KEY.getBytes());
 
-                JWTVerifier verifier = JWT.require(algorithm).build();
-
-                DecodedJWT decodedJWT = verifier.verify(entity.getOtp());
-
-                String email = decodedJWT.getSubject();
-                String code = decodedJWT.getClaim("code").asString();
-
-
-                template.opsForValue().set(email, time + 1);
-
-                if (code.equals(otp.getOtp()) && email.equals(entity.getEmail())) {
+                if (codeOTP.getOtp().equals(otp.getOtp()) && codeOTP.getEmail().equals(entity.getEmail())) {
                     String accessToken = TokenUtils.createAccessToken(entity);
-                    String refreshToken = TokenUtils.createRefreshToken(entity.getEmail());
 
-                    return new TokenDto(accessToken, refreshToken);
+                    return new TokenDto(accessToken);
                 }
-            } catch (TokenExpiredException ex) {
 
-                throw new EOException(CommonStatus.OtpExpired);
-
-            }
             throw new EOException(UserStatus.WRONG_OTP);
 
         }
@@ -143,11 +119,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     }
 
-    private void validateDto(UserRequest dto) {
-        if (!StringUtils.hasText(dto.getUsername())) {
-            throw new EOException(UserStatus.USERNAME_IS_EMPTY);
-        }
+    @Override
+    public UserResponseDto getUser() {
+        String  email = SecurityUtils.getEmail();
+        UserEntity user=userRepository.findByEmail(email);
 
+        return entityToDto(user);
+
+    }
+
+    private void validateDto(UserRequest dto) {
         if (userRepository.findByEmail(dto.getEmail()) != null) {
             throw new EOException(UserStatus.EMAIL_IS_EXIST);
         }
@@ -162,20 +143,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         return user;
     }
 
-    @Override
-    public TokenDto refreshToken(String refreshToken) {
-        Map<String, Object> claims = TokenUtils.verifyToken(refreshToken);
-        String email = claims.get("email").toString();
-        UserEntity user = userRepository.findByEmail(email);
-
-        if (null == user) {
-            throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
-        }
-
-        String accessToken = TokenUtils.createAccessToken(user);
-        refreshToken = TokenUtils.createRefreshToken(user.getEmail());
-        return new TokenDto(accessToken, refreshToken);
-    }
 
     @Override
     public EmailResponse sendPasswordResetCode(String email) {
@@ -186,8 +153,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                     MessageCodes.EMAIL_NOT_FOUND, String.valueOf(email));
         }
         String token = TokenUtils.createCode(code, email);
-        user.setOtp(token);
-        userRepository.save(user);
+
+
+        Otp otp= Otp.builder()
+                .otp( token)
+                .email(user.getEmail())
+                .build();
+        template.opsForValue().set(otp.getEmail(), otp, 5, TimeUnit.MINUTES);
 
         String baseUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
 
@@ -226,11 +198,16 @@ public class UserServiceImpl implements UserService, UserDetailsService {
                 throw new EOException(ENTITY_NOT_FOUND,
                         MessageCodes.EMAIL_NOT_FOUND, String.valueOf(email));
             }
+            Otp codeOTP = (Otp) template.opsForValue().get(email);
 
+            if (codeOTP==null) {
+
+                throw new EOException(CommonStatus.ACCOUNT_NOT_OTP);
+            }
 
             String pasword1 = passwordResetRequest.getPassword();
             String pasword2 = passwordResetRequest.getPassword2();
-            if (token.equals(user.getOtp()) && pasword1.equals(pasword2)) {
+            if (token.equals(codeOTP.getOtp()) && pasword1.equals(pasword2)) {
                 user.setPassword(bCryptPasswordEncoder.encode(pasword1));
                 userRepository.save(user);
                 return MessageCodes.PROCESSED_SUCCESSFULLY;
@@ -253,7 +230,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     private void dtoToEntiy(UserRequest userRequestDto, UserEntity userEntity) {
-        userEntity.setUsername(userRequestDto.getUsername());
+        userEntity.setFullName(userRequestDto.getFullName());
         userEntity.setEmail(userRequestDto.getEmail());
         userEntity.setRole(userRequestDto.getRole());
         userEntity.setOccupation(userRequestDto.getOccupation());

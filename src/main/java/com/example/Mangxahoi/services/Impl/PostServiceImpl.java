@@ -157,7 +157,7 @@ public class PostServiceImpl implements PostService {
             postRepository.delete(post);
             return  MessageCodes.PROCESSED_SUCCESSFULLY ;
         }
-        return  MessageCodes.FAILURE ;
+        throw new EOException(CommonStatus.FAILURE) ;
 
     }
 

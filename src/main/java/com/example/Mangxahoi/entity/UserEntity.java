@@ -21,8 +21,8 @@ public class UserEntity implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long  id;
 
-    @Column(name = "username", nullable = false, length = 100)
-    private String username;
+    @Column(name = "full_name", nullable = false, length = 100)
+    private String fullName;
 
     @Column(name = "email", nullable = false,columnDefinition = "VARCHAR(100) COLLATE utf8mb4_bin")
     private String email;
@@ -57,9 +57,6 @@ public class UserEntity implements UserDetails {
     @Column(name = "updated_at")
     private Instant updatedAt;
 
-    @Column(name = "otp")
-    private String otp;
-
     @Column(name = "dateBirth", nullable = false)
     private LocalDate dateBirth;
 
@@ -92,6 +89,13 @@ public class UserEntity implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return  Collections.singletonList(new SimpleGrantedAuthority(role));
     }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+
 
     @Override
     public boolean isAccountNonExpired() {

@@ -8,6 +8,6 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class ValidationErrorSubError implements ApiSubError {
-    private String field;
-    private String message;
+    private final String errorMessage;
+    private final String value;
 }

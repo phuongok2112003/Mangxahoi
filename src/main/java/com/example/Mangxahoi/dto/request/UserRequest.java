@@ -17,9 +17,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 public class UserRequest {
-    @NotBlank(message = "Username cannot be empty")
-    @Pattern(regexp = "^[a-zA-Z0-9]*$", message = "Username must not contain special characters")
-    private String username;
+    @NotBlank(message = "Full name cannot be empty")
+    @Pattern(regexp = "^[a-zA-ZÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûüýþÿ' ]+$",
+            message = "Full name can only contain letters, spaces, and apostrophes")
+    private String fullName;
+
 
     @NotBlank(message = "Email cannot be empty")
     @Email(message = "Email should be valid")

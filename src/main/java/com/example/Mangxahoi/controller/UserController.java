@@ -24,7 +24,7 @@ import java.io.IOException;
 public class UserController {
     private final UserService userService;
 
-    @PostMapping
+    @PostMapping("/register")
     public  EOResponse<UserResponseDto>  register(@Valid @RequestBody UserRequest userDto) {
         return  EOResponse.build(userService.register(userDto));
     }
@@ -45,9 +45,9 @@ public class UserController {
     public EOResponse<TokenDto> getToken(@RequestBody Otp otp){
         return EOResponse.build(userService.getToken(otp));
     }
-    @PostMapping("/refresh-token")
-    public EOResponse<TokenDto> refreshToken(@RequestParam("token") String token) {
-        return  EOResponse.build(userService.refreshToken(token));
+    @GetMapping("")
+    public EOResponse<UserResponseDto> getUser() {
+        return  EOResponse.build(userService.getUser());
     }
 
     @PostMapping("/forgot")

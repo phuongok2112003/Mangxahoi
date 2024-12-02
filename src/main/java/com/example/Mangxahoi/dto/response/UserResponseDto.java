@@ -18,7 +18,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserResponseDto {
     private Long id;
-    private String username;
+    private String fullName;
     private String email;
     private Boolean gender ;
     private String occupation;//nghe nghiep

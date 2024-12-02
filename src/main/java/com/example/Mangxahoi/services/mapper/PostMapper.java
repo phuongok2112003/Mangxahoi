@@ -28,7 +28,7 @@ public class PostMapper {
                 .user(UserResponseDto.builder()
                         .id(entity.getUser().getId())
                         .gender(entity.getUser().getGender())
-                        .username(entity.getUser().getUsername())
+                        .fullName(entity.getUser().getFullName())
                         .email((entity.getUser().getEmail()))
                         .build())
                 .likes(favoriteResponses)

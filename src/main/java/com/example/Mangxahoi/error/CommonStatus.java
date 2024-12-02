@@ -10,9 +10,10 @@ public enum CommonStatus implements ErrorStatus {
     TokenExpired(401,"errors.the Token has expired"),
     OtpExpired(401,"errors.the Otp has expired"),
     ACCOUNT_NOT_FOUND(400, "errors.account_not_found"),
-    ACCOUNT_LOG_TOO(400, "errors.Your account has logged in too many times"),
+    ACCOUNT_NOT_OTP(400, "errors.Not otp"),
     PASSWORD_NOT_CONFIRM(400,"errors.password_not_confirm"),
     CANNOT_SEND_EMAIL(400, "errors.cant_sent_email"),
+     FAILURE(400,"Failure"),
 
     ;
 

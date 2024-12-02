@@ -79,7 +79,7 @@ public class FriendServiceIml implements FriendService {
                             .gender(receiver.getGender())
                             .location(receiver.getLocation())
                             .occupation(receiver.getOccupation())
-                            .username(receiver.getUsername())
+                            .fullName(receiver.getFullName())
                             .build()).build();
         } else {
             throw new EOException(ERROR_CODE,
@@ -130,7 +130,7 @@ public class FriendServiceIml implements FriendService {
                         .gender(sender.getGender())
                         .location(sender.getLocation())
                         .occupation(sender.getOccupation())
-                        .username(sender.getUsername())
+                        .fullName(sender.getFullName())
                         .build()).build();
     }
 
@@ -151,7 +151,7 @@ public class FriendServiceIml implements FriendService {
                                 .gender(friendEntity.getGender())
                                 .location(friendEntity.getLocation())
                                 .occupation(friendEntity.getOccupation())
-                                .username(friendEntity.getUsername())
+                                .fullName(friendEntity.getFullName())
                                 .build()).build()
         ).toList();
         return PageResponse.<FriendResponse>builder()
@@ -179,7 +179,7 @@ public class FriendServiceIml implements FriendService {
                                 .gender(friendEntity.getSender().getGender())
                                 .location(friendEntity.getSender().getLocation())
                                 .occupation(friendEntity.getSender().getOccupation())
-                                .username(friendEntity.getSender().getUsername())
+                                .fullName(friendEntity.getSender().getFullName())
                                 .build()).build()
         ).toList();
         return friendResponses;

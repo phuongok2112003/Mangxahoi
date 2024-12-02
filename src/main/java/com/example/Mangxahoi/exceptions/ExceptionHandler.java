@@ -28,16 +28,16 @@ public class ExceptionHandler {
     protected ResponseEntity<Object> handleException(Exception ex) {
         log.error("Handle Exception: errorMessage = {}", ex.getMessage(), ex);
         ApiMessageError error = new ApiMessageError(ex.getMessage(), null);
-        return ResponseEntity.status(500).body(EOResponse.build(HttpStatus.INTERNAL_SERVER_ERROR.value(), "errors.internal_server_error", error, new Object[0]));
+        return ResponseEntity.status(500).body(EOResponse.build( "errors.internal_server_error", error, new Object[0]));
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler({EntityNotFoundException.class})
     protected ResponseEntity<Object> handleEntityNotFound(EntityNotFoundException ex) {
         ApiEntityNotFoundError subError = ex.getApiSubErrors();
-        String fieldValuesStr = (String) subError.getFieldValues().stream().map(Objects::toString).collect(Collectors.joining(", "));
+        String fieldValuesStr = subError.getValue();
         log.error("Handle EntityNotFoundException. errorCode = {}, errorMessage = {}, className = {}. FieldValues: {}",
-                new Object[]{ex.code, ex.getMessage(), subError.getClassName(), fieldValuesStr});
-        return ResponseEntity.status(500).body(EOResponse.buildMsg(ex.code, ex.message, subError));
+                new Object[]{ex.code, ex.getMessage(), subError.getErrorMessage(), fieldValuesStr});
+        return ResponseEntity.status(400).body(EOResponse.buildMsg(ex.code, ex.message, subError));
     }
     @org.springframework.web.bind.annotation.ExceptionHandler({AccessDeniedException.class})
     protected ResponseEntity<Object> handleEntityNotFound(AccessDeniedException ex) {

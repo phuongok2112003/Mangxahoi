@@ -19,15 +19,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
+    private final List<String> publicUrls;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
+    public CustomAuthorizationFilter(String[] publicUrls) {
+        this.publicUrls = List.of(publicUrls);
+    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -35,10 +38,20 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
+        String servletPath = request.getServletPath();
+        boolean isPublicUrl = publicUrls.stream().anyMatch(pattern -> pathMatcher.match(pattern, servletPath));
+
 
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+        if (isPublicUrl && authorizationHeader == null) {
             filterChain.doFilter(request, response);
+            return;
+        }
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ") ) {
+            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write(ConvertUtils.toString(DataError.build(CommonStatus.TokenIsInvalid)));
+            response.getWriter().flush();
             return;
         }
 
@@ -71,7 +84,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
         UserEntity user = new UserEntity();
         user.setId(userId);
         user.setEmail(email);
-        user.setUsername(username);
+
 
         String[] roles = (String[]) claims.get("roles");
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
