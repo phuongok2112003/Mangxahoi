@@ -32,7 +32,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public Otp login(LoginRequest loginRequest)  {
         try {
-            String username = loginRequest.getUsername();
+            String username = loginRequest.getEmail();
             String password = loginRequest.getPassword();
 
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
@@ -44,7 +44,7 @@ public class AuthServiceImpl implements AuthService {
                     .email(user.getEmail())
                     .build();
 
-            template.opsForValue().set(otp.getEmail(), otp, 5, TimeUnit.MINUTES);
+            template.opsForValue().set( otp.getEmail().toLowerCase(), otp, 5, TimeUnit.MINUTES);
 
             return otp;
         } catch (AuthenticationException e) {

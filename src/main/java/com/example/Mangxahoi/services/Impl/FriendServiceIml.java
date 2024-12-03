@@ -158,7 +158,7 @@ public class FriendServiceIml implements FriendService {
                 .currentPage(page)
                 .pageSize(friendEntityList.getSize())
                 .totalElements(friendEntityList.getTotalElements())
-                .data(friendResponses)
+                .content(friendResponses)
                 .totalPages(friendEntityList.getTotalPages())
                 .build();
     }

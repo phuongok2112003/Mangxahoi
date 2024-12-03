@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         } else {
 
-                Otp codeOTP = (Otp) template.opsForValue().get(otp.getEmail());
+                Otp codeOTP = (Otp) template.opsForValue().get(otp.getEmail().toLowerCase());
 
                 if (codeOTP==null) {
 

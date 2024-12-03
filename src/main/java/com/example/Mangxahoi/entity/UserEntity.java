@@ -24,7 +24,7 @@ public class UserEntity implements UserDetails {
     @Column(name = "full_name", nullable = false, length = 100)
     private String fullName;
 
-    @Column(name = "email", nullable = false,columnDefinition = "VARCHAR(100) COLLATE utf8mb4_bin")
+    @Column(name = "email", nullable = false)
     private String email;
 
     @Column(name = "password", nullable = false, length = 100)

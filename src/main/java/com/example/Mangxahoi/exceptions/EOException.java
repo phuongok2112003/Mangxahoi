@@ -2,16 +2,20 @@ package com.example.Mangxahoi.exceptions;
 
 import com.example.Mangxahoi.error.ErrorStatus;
 import com.example.Mangxahoi.utils.EbsI18n;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 @EqualsAndHashCode(callSuper = true)
 @Data
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class EOException extends RuntimeException{
-    protected final int code;
-    protected final String message;
-    protected final String value;
+    protected  int code;
+    protected  String message;
+    protected  String value;
 
 
     public EOException(HttpStatus httpStatus, String messageUrl, @Nullable String value, Object... arg) {

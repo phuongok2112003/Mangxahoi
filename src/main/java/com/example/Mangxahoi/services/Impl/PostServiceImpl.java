@@ -49,6 +49,9 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse createPost(  PostRequest postRequest)  {
+        if(postRequest.getImageRequest().getUrl().isEmpty() && postRequest.getContent().isEmpty()){
+            throw new EOException(CommonStatus.CHECK_POST);
+        }
 
         String email = SecurityUtils.getEmail();
         UserEntity userEntity = userRepository.findByEmail(email);
@@ -77,9 +80,16 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostResponse updatePost(@NonNull Long id,@NonNull PostRequest postRequest) {
-
+        if(postRequest.getImageRequest().getUrl().isEmpty() && postRequest.getContent().isEmpty()){
+            throw new EOException(CommonStatus.CHECK_POST);
+        }
         PostEntity post=postRepository.findById(id).orElseThrow(
                 () ->  new EntityNotFoundException(PostEntity.class.getName(), "id", id.toString()));
+
+
+        if(!SecurityUtils.checkUser(post.getUser().getUsername()))
+                throw new EOException(CommonStatus.FORBIDDEN);
+
         List<ImageEntity> imageEntities = new ArrayList<>();
 
 
@@ -123,7 +133,7 @@ public class PostServiceImpl implements PostService {
                 .currentPage(page)
                 .pageSize(list.getSize())
                 .totalElements(list.getTotalElements())
-                .data(responseList)
+                .content(responseList)
                 .totalPages(list.getTotalPages())
                 .build();
     }
@@ -143,7 +153,7 @@ public class PostServiceImpl implements PostService {
                 .currentPage(page)
                 .pageSize(list.getSize())
                 .totalElements(list.getTotalElements())
-                .data(responseList)
+                .content(responseList)
                 .totalPages(list.getTotalPages())
                 .build();
     }
@@ -163,7 +173,7 @@ public class PostServiceImpl implements PostService {
 
     public void saveImage(List<ImageEntity> imageEntities, ImageRequest imageRequest, PostEntity post) {
 
-        // Duyệt qua từng URL trong yêu cầu
+
         for (String url : imageRequest.getUrl()) {
             if (url == null ||
                     !(url.toLowerCase().endsWith(".jpeg") ||
@@ -173,9 +183,9 @@ public class PostServiceImpl implements PostService {
                 throw new EOException(ERROR_CODE, MessageCodes.FILE_UPLOAD_NOT_FORMAT, url);
             }
 
-            // Tạo đối tượng ImageEntity và thêm vào danh sách
+
             ImageEntity imageEntity = ImageEntity.builder()
-                    .createdAt(Instant.now())  // Sử dụng đúng tên phương thức để thiết lập ngày giờ
+                    .createdAt(Instant.now())
                     .url(url)
                     .post(post)
                     .build();

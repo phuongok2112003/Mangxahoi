@@ -11,7 +11,7 @@ public class EntityNotFoundException extends EOException {
     private final ApiEntityNotFoundError apiSubErrors;
 
     public EntityNotFoundException(String className, String field, Object value) {
-        super(404001, "errors.not_found_entity", (String) value, new Object[0]);
+        super(404001, "errors.not_found_entity", (String) value);
         this.apiSubErrors = new ApiEntityNotFoundError(className, field, value);
     }
 

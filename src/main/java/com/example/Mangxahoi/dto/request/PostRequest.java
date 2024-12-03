@@ -3,6 +3,7 @@ package com.example.Mangxahoi.dto.request;
 import com.example.Mangxahoi.constans.enums.PostStatus;
 import com.example.Mangxahoi.dto.response.ImageResponse;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

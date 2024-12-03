@@ -14,11 +14,11 @@ import java.util.List;
 @Setter
 public class EOResponse<T> {
 
-    @JsonFormat(
-            shape = JsonFormat.Shape.STRING,
-            pattern ="yyyy-MM-dd'T'HH:mm:ss"
-    )
-    private LocalDateTime timestamp = LocalDateTime.now();
+//    @JsonFormat(
+//            shape = JsonFormat.Shape.STRING,
+//            pattern ="yyyy-MM-dd'T'HH:mm:ss"
+//    )
+//    private LocalDateTime timestamp = LocalDateTime.now();
     private String message;
 
     private T data;

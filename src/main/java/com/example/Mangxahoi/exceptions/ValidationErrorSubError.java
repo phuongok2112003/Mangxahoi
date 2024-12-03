@@ -9,5 +9,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class ValidationErrorSubError implements ApiSubError {
     private final String errorMessage;
-    private final String value;
+//    private final String value;
 }

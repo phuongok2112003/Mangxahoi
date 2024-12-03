@@ -10,11 +10,10 @@ import java.util.List;
 public class ApiEntityNotFoundError implements ApiSubError, Serializable  {
 
     private final String errorMessage;
-    private final String value;
+//    private final String value;
 
     public ApiEntityNotFoundError(String className, String field, Object value) {
-        this.errorMessage = className;
-        this.value = String.format("Not found field: %s with value: %s", field, value);
+        this.errorMessage = String.format("Not found field: %s with value: %s", field, value);
     }
 
 

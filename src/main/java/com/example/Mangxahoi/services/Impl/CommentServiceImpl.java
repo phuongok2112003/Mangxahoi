@@ -2,6 +2,7 @@ package com.example.Mangxahoi.services.Impl;
 
 import com.example.Mangxahoi.constans.ErrorCodes;
 import com.example.Mangxahoi.constans.MessageCodes;
+import com.example.Mangxahoi.constans.enums.PostStatus;
 import com.example.Mangxahoi.dto.request.CommentRequest;
 import com.example.Mangxahoi.dto.request.NotificationRequest;
 import com.example.Mangxahoi.dto.response.CommentResponse;
@@ -46,6 +47,9 @@ public class CommentServiceImpl implements CommentService {
         }
         PostEntity postEntity = postRepository.findById(postId).orElseThrow(
                 () ->  new EntityNotFoundException(PostEntity.class.getName(), "id", postId.toString()));
+
+        if(!SecurityUtils.checkUser(postEntity.getUser().getUsername())&&postEntity.getStatus().equals(PostStatus.PRIVATE))
+            throw new EOException(CommonStatus.FORBIDDEN);
 
         CommentEntity comment = CommentEntity.builder()
                 .user(userEntity)
@@ -97,7 +101,11 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public PageResponse<CommentResponse> getAll(Long postId, int page, int size) {
+        PostEntity postEntity = postRepository.findById(postId).orElseThrow(
+                () ->  new EntityNotFoundException(PostEntity.class.getName(), "id", postId.toString()));
 
+        if(!SecurityUtils.checkUser(postEntity.getUser().getUsername())&&postEntity.getStatus().equals(PostStatus.PRIVATE))
+            throw new EOException(CommonStatus.FORBIDDEN);
         Sort sort = Sort.by("createdAt").descending();
         Pageable pageable= PageRequest.of(page-1,size,sort);
 
@@ -107,7 +115,7 @@ public class CommentServiceImpl implements CommentService {
                 .currentPage(page)
                 .pageSize(entityList.getSize())
                 .totalElements(entityList.getTotalElements())
-                .data(commentResponses)
+                .content(commentResponses)
                 .totalPages(entityList.getTotalPages())
                 .build();
     }
