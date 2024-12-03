@@ -1,5 +1,6 @@
 package com.example.Mangxahoi.error;
 
+import com.example.Mangxahoi.exceptions.ApiMessageError;
 import com.example.Mangxahoi.utils.EbsI18n;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +17,8 @@ public class DataError<T> {
 
     public static <T> DataError<T> build(ErrorStatus status){
         DataError<T> response = new DataError<>();
-        response.message = EbsI18n.get(status.getMessage());
+        response.message =CommonStatus.FAILURE.getMessage();
+        response.data= (T) new ApiMessageError( EbsI18n.get(status.getMessage()));
         return response;
     }
 
