@@ -57,7 +57,7 @@ public class ImageServiceTest {
     void setUp() throws IOException {
         userEntity = UserEntity.builder()
                 .email("admin@gmail.com")
-                .username("admin")
+                .fullName("admin")
                 .dateBirth(LocalDate.parse("2003-11-02"))
                 .id(1L)
                 .gender(true)

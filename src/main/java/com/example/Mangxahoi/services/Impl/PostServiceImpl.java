@@ -165,9 +165,13 @@ public class PostServiceImpl implements PostService {
                 () -> new EntityNotFoundException(PostEntity.class.getName(), "id", id.toString()));
         if (SecurityUtils.checkUser(post.getUser().getUsername())) {
             postRepository.delete(post);
+            for(ImageEntity image : post.getImages()){
+
+                imageService.deleteImage(image.getUrl());
+            }
             return  MessageCodes.PROCESSED_SUCCESSFULLY ;
         }
-        throw new EOException(CommonStatus.FAILURE) ;
+        throw new EOException(CommonStatus.FORBIDDEN) ;
 
     }
 

@@ -64,7 +64,7 @@ public class ImageServiceImpl implements ImageService {
                 String filename = isValidation(fileNameImage, IMAGE_UPLOAD_DIR + "/post-image/");
                 Path path = Paths.get(IMAGE_UPLOAD_DIR + "/post-image/" + filename);
                 Files.write(path, file.getBytes());
-                uploadFIleReponseDto.setUrl("post-image/" + filename);
+                uploadFIleReponseDto.setUrl("/post-image/" + filename);
                 list.add(uploadFIleReponseDto);
 
             } catch (IOException e) {
@@ -151,7 +151,7 @@ public class ImageServiceImpl implements ImageService {
             if (null == userEntity) {
                 throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
             } else {
-                if (!userEntity.getAvatarUrl().isEmpty())
+                if (userEntity.getAvatarUrl()!=null)
                     deleteImage(userEntity.getAvatarUrl());
                 Files.write(path, file.getBytes());
 

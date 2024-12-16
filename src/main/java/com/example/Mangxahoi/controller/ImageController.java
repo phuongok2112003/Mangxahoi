@@ -1,5 +1,6 @@
 package com.example.Mangxahoi.controller;
 
+import com.example.Mangxahoi.dto.request.ImageRequest;
 import com.example.Mangxahoi.dto.response.ImageResponse;
 import com.example.Mangxahoi.services.ImageService;
 import com.example.Mangxahoi.utils.EOResponse;
@@ -49,6 +50,10 @@ public class ImageController {
         }
     }
 
+    @PutMapping(value = "/put-image",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public EOResponse<List<ImageResponse>> putImage(@RequestPart("files") MultipartFile[] files,ImageRequest imageCurr) {
 
+        return EOResponse.build(imageService.updateImage(imageCurr,files));
+    }
 
 }
