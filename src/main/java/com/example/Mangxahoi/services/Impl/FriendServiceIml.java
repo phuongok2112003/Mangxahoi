@@ -66,7 +66,7 @@ public class FriendServiceIml implements FriendService {
 
             template.send("add-friend",NotificationRequest.builder()
                     .userId(receiverId)
-                    .content("add-friend: "+sender.getUsername()+" send friend to you ")
+                    .content("add-friend: "+sender.getUsername()+" send friend to you by id :"+sender.getId())
                     .build());
 
             return FriendResponse.builder()
