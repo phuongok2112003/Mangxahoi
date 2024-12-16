@@ -33,17 +33,23 @@ public class LikeServiceImpl implements LikeService {
         if (null == userEntity) {
             throw new EOException(CommonStatus.ACCOUNT_NOT_FOUND);
         }
+
         PostEntity postEntity = postRepository.findById(postId).orElseThrow(
                 () ->  new EntityNotFoundException(PostEntity.class.getName(), "id", postId.toString()));
-        FavoriteEntity favoriteEntity= FavoriteEntity.builder()
-                .post(postEntity)
-                .user(userEntity)
-                .createdAt(Instant.now())
-                .updatedAt(Instant.now())
-                .build();
+        if(!likeRepository.existsByPostAndUser(postEntity,userEntity)){
+            FavoriteEntity favoriteEntity= FavoriteEntity.builder()
+                    .post(postEntity)
+                    .user(userEntity)
+                    .createdAt(Instant.now())
+                    .updatedAt(Instant.now())
+                    .build();
 
-        likeRepository.save(favoriteEntity);
-        return FavoriteMapper.entityToResponse(favoriteEntity);
+            likeRepository.save(favoriteEntity);
+            return FavoriteMapper.entityToResponse(favoriteEntity);
+        }else {
+            throw new EOException(CommonStatus.CANNOT_LIKE_POST);
+        }
+
     }
 
     @Override

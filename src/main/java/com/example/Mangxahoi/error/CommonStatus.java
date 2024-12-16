@@ -13,6 +13,7 @@ public enum CommonStatus implements ErrorStatus {
     ACCOUNT_NOT_OTP(400, "errors.not_otp"),
     PASSWORD_NOT_CONFIRM(400,"errors.password_not_confirm"),
     CANNOT_SEND_EMAIL(400, "errors.cant_sent_email"),
+    CANNOT_LIKE_POST(400, "errors.you_liked_this_post"),
      FAILURE(400,"Failure"),
     CHECK_POST(400,"errors.content_and_images_is_empty"),
     ;
