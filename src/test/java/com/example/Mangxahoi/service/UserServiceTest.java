@@ -112,11 +112,11 @@ public class UserServiceTest {
         when(userRepository.save(any(UserEntity.class))).thenReturn(user);
 
         // Act
-        UserResponseDto result = userService.register(userRequest);
+        String result = userService.register(userRequest);
 
         // Assert
         assertNotNull(result);
-        Assertions.assertEquals(userRequest.getEmail(), result.getEmail());
+        Assertions.assertEquals(result,MessageCodes.PROCESSED_SUCCESSFULLY);
 
     }
 

@@ -2,6 +2,7 @@ package com.example.Mangxahoi.services.Impl;
 
 import com.example.Mangxahoi.constans.ErrorCodes;
 import com.example.Mangxahoi.constans.MessageCodes;
+import com.example.Mangxahoi.constans.enums.PostStatus;
 import com.example.Mangxahoi.dto.response.FavoriteResponse;
 import com.example.Mangxahoi.entity.FavoriteEntity;
 import com.example.Mangxahoi.entity.PostEntity;
@@ -36,6 +37,8 @@ public class LikeServiceImpl implements LikeService {
 
         PostEntity postEntity = postRepository.findById(postId).orElseThrow(
                 () ->  new EntityNotFoundException(PostEntity.class.getName(), "id", postId.toString()));
+        if(!SecurityUtils.checkUser(postEntity.getUser().getUsername())&&postEntity.getStatus().equals(PostStatus.PRIVATE))
+            throw new EOException(CommonStatus.FORBIDDEN);
         if(!likeRepository.existsByPostAndUser(postEntity,userEntity)){
             FavoriteEntity favoriteEntity= FavoriteEntity.builder()
                     .post(postEntity)

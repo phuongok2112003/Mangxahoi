@@ -2,10 +2,12 @@ package com.example.Mangxahoi.controller;
 
 import com.example.Mangxahoi.dto.Otp;
 import com.example.Mangxahoi.dto.TokenDto;
+import com.example.Mangxahoi.dto.request.LoginRequest;
 import com.example.Mangxahoi.dto.request.PasswordResetRequest;
 import com.example.Mangxahoi.dto.request.UserRequest;
 import com.example.Mangxahoi.dto.response.EmailResponse;
 import com.example.Mangxahoi.dto.response.UserResponseDto;
+import com.example.Mangxahoi.services.AuthService;
 import com.example.Mangxahoi.services.UserService;
 import com.example.Mangxahoi.utils.EOResponse;
 import jakarta.validation.Valid;
@@ -23,9 +25,13 @@ import java.io.IOException;
 @Slf4j
 public class UserController {
     private final UserService userService;
-
+    private final AuthService authService;
+    @PostMapping("/login")
+    public EOResponse<Otp> login(@Valid @RequestBody LoginRequest loginRequest)  {
+        return EOResponse.build(authService.login(loginRequest));
+    }
     @PostMapping("/register")
-    public  EOResponse<UserResponseDto>  register(@Valid @RequestBody UserRequest userDto) {
+    public  EOResponse<String>  register(@Valid @RequestBody UserRequest userDto) {
         return  EOResponse.build(userService.register(userDto));
     }
 

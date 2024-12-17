@@ -23,16 +23,14 @@ import com.example.Mangxahoi.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
@@ -143,7 +141,14 @@ public class PostServiceImpl implements PostService {
 
         Sort sort = Sort.by("createdAt").ascending();
         Pageable pageable= PageRequest.of(page-1,size,sort);
-        Page<PostEntity> list=postRepository.findByUserId(userId,pageable);
+        Page<PostEntity> list=null;
+        if(Objects.equals(SecurityUtils.getCurrentUser().getId(), userId)){
+           list=postRepository.findByUserId(userId,pageable);
+        }
+        else{
+           list=postRepository.findByUserIdStatus(userId,pageable);
+        }
+
         if(list.isEmpty()){
             throw new EOException(ENTITY_NOT_FOUND,
                     MessageCodes.NOT_POST, String.valueOf(userId));

@@ -48,15 +48,15 @@ public class UserControllerTest {
     void register_ShouldReturnUserResponse_WhenSuccessful() throws Exception {
         UserResponseDto mockResponse = UserResponseDto.builder()
                 .id(1L)
-                .username("user1")
+                .fullName("user1")
                 .email("user1@gmail.com")
                 .build();
         UserRequest userRequest = UserRequest.builder()
-                .username("user1")
+                .fullName("user1")
                 .email("user1@gmail.com")
                 .password("1234")
                 .build();
-        Mockito.when(userService.register(any(UserRequest.class))).thenReturn(mockResponse);
+        Mockito.when(userService.register(any(UserRequest.class))).thenReturn(MessageCodes.PROCESSED_SUCCESSFULLY);
 
 
         mockMvc.perform(post("/user")
@@ -84,11 +84,11 @@ public class UserControllerTest {
     void update_ShouldReturnUpdatedUser_WhenSuccessful() throws Exception {
         UserResponseDto mockResponse = UserResponseDto.builder()
                 .id(1L)
-                .username("user1")
+                .fullName("user1")
                 .email("user1@gmail.com")
                 .build();
         UserRequest userRequest = UserRequest.builder()
-                .username("user1")
+                .fullName("user1")
                 .email("user1@gmail.com")
                 .password("1234")
                 .build();
@@ -109,7 +109,7 @@ public class UserControllerTest {
                 "XNlciJdLCJpZCI6MSwiZXhwIjoxNzMwMzkwODYzLCJpYXQiOjE3MzAzODcyNjMsInVzZXJuYW1lIjoicGh1b25nIn0.U1uKEh013i8O7ukPUD0dcZt31EwDL7xOTPmrFtxvn5Q";
         String ref="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwaHVvbmciLCJleHAiOjE3MzI5NzkyNjN9.9hTPlFxLVTsFVUNZ-2S1lkhczaf05QxCTdufnO_ohvE";
         tokenDto.setAccessToken(acc);
-        tokenDto.setRefreshToken(ref);
+
         Otp otp = new Otp("1248","phuong0961070156@gmail.com");
         Mockito.when(userService.getToken(any(Otp.class))).thenReturn(tokenDto);
 
@@ -130,8 +130,7 @@ public class UserControllerTest {
         String ref="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJwaHVvbmdAZ21haWwuY29tIiwiZXhwIjoxNzMyOTgwNjQzfQ.XrNrz9mXNDVk6u_jkgS04qQtqyVANDgD0ZSg18ceAfc";
 
         tokenDto.setAccessToken(acc);
-        tokenDto.setRefreshToken(ref);
-        Mockito.when(userService.refreshToken(any(String.class))).thenReturn(tokenDto);
+
 
         mockMvc.perform(post("/user/refresh-token")
                         .param("token", curref))
@@ -172,7 +171,7 @@ public class UserControllerTest {
     void getUser_ShouldReturnUser_WhenUserExists() throws Exception {
         UserResponseDto mockResponse = UserResponseDto.builder()
                 .id(1L)
-                .username("user1")
+                .fullName("user1")
                 .email("user1@gmail.com")
                 .build();
         Mockito.when(userService.getUser(anyLong())).thenReturn(mockResponse);

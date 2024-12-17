@@ -105,10 +105,13 @@ public class FriendServiceIml implements FriendService {
             throw new EOException(ENTITY_NOT_FOUND, MessageCodes.ACC_NOT_SEND_ADD_FRIEND, senderId.toString());
         }
 
-        if(request.getStatus()==FriendshipStatus.REJECTED){
-            friendRepository.delete(friendEntity);
-        }
+
         else  {
+            if(friendEntity.getStatus().equals(FriendshipStatus.ACCEPTED)&&request.getStatus().equals(FriendshipStatus.PENDING)
+            ||friendEntity.getStatus().equals(FriendshipStatus.REJECTED)&&request.getStatus().equals(FriendshipStatus.ACCEPTED)
+            ){
+                throw new EOException(CommonStatus.WRONG_OPERATION);
+            }
             friendEntity.setStatus(request.getStatus());
 
             notificationService.createNotification(NotificationRequest.builder()

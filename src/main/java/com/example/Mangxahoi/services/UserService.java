@@ -13,7 +13,7 @@ import java.io.IOException;
 
 
 public interface UserService {
-    UserResponseDto register(UserRequest dto);
+    String register(UserRequest dto);
     UserResponseDto update(@NonNull Long id, UserRequest dto);
     String delete(Long id);
     String turnOnOffSatus(Long id);

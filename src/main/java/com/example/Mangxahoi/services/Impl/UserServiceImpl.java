@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
     private final RedisTemplate<Object, Object> template;
 
     @Override
-    public UserResponseDto register(UserRequest dto) {
+    public String register(UserRequest dto) {
 
         this.validateDto(dto);
         if (!StringUtils.hasText(dto.getPassword())) {
@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
         dtoToEntiy(dto, user);
         user.setRole(UserRole.USER);
         user = userRepository.save(user);
-        return entityToDto(user);
+        return MessageCodes.PROCESSED_SUCCESSFULLY;
     }
 
     @PostAuthorize("returnObject.username == authentication.name")
@@ -132,8 +132,10 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
                 if (codeOTP.getOtp().equals(otp.getOtp()) && codeOTP.getEmail().equals(entity.getEmail())) {
                     String accessToken = TokenUtils.createAccessToken(entity);
+                    UserEntity user=userRepository.findByEmail(codeOTP.getEmail());
+                    UserResponseDto userResponseDto=entityToDto(user);
 
-                    return new TokenDto(accessToken);
+                    return new TokenDto(accessToken,userResponseDto);
                 }
 
             throw new EOException(UserStatus.WRONG_OTP);

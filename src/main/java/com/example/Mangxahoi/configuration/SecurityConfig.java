@@ -57,7 +57,7 @@ public class SecurityConfig {
             "/user/forgot",
             "/user/reset-password",
             "/user/reset-password",
-            "/api/login",
+            "/user/login",
             "/image/avatar-image/**",
             "/image/post-image/**"
     };

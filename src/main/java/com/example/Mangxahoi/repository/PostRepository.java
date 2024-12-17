@@ -22,6 +22,10 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
 
 
     Page<PostEntity> findByUserId(Long userId,Pageable pageable);
+    @Query("SELECT p FROM PostEntity p " +
+            "WHERE p.user.id= :userId " +
+            "AND p.status = 'PUBLIC'")
+    Page<PostEntity> findByUserIdStatus(Long userId,Pageable pageable);
 
     long countByUserIdAndCreatedAtBetween(Long userId, Instant startOfWeek, Instant endOfWeek);
 }

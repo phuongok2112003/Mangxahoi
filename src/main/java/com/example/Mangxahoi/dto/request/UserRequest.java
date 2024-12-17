@@ -31,6 +31,7 @@ public class UserRequest {
     @Size(min = 4, message = "Password must be at least 4 characters long")
     private String password;
     private UserRole role ;
+    @NotBlank(message = "Gender cannot be empty")
     private Boolean gender ;
     private boolean isActive=true ;
     private LocalDate dateBirth;
