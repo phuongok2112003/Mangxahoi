@@ -60,21 +60,21 @@ public class UserEntity implements UserDetails {
     @Column(name = "dateBirth", nullable = false)
     private LocalDate dateBirth;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostEntity> posts;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<CommentEntity> comments;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FavoriteEntity> likes;
 
-    @OneToMany(mappedBy = "sender")
+    @OneToMany(mappedBy = "sender", cascade = CascadeType.ALL, orphanRemoval = true)
     private  Set<FriendEntity> sentFriendRequest;
 
-    @OneToMany(mappedBy = "receiver")
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<FriendEntity> receivedRequests = new HashSet<>();
 
     public UserRole getRole() {
@@ -116,6 +116,5 @@ public class UserEntity implements UserDetails {
     public boolean isEnabled() {
         return isActive;
     }
-
 
 }
