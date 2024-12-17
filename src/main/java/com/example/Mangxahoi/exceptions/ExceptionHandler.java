@@ -27,7 +27,7 @@ public class ExceptionHandler {
     protected ResponseEntity<Object> handleException(Exception ex) {
         log.error("Handle Exception: errorMessage = {}", ex.getMessage(), ex);
         ApiMessageError error = new ApiMessageError(ex.getMessage());
-        return ResponseEntity.status(500).body(EOResponse.build( "errors.internal_server_error", error, new Object[0]));
+        return ResponseEntity.status(500).body(EOResponse.build( ex.getMessage(), error, new Object[0]));
     }
 
     @org.springframework.web.bind.annotation.ExceptionHandler({EntityNotFoundException.class})

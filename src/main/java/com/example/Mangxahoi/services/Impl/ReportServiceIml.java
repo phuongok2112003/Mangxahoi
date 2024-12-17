@@ -34,8 +34,8 @@ public class ReportServiceIml implements ReportService {
         UserEntity userEntity= SecurityUtils.getCurrentUser();
         long postsCount = postRepository.countByUserIdAndCreatedAtBetween(userEntity.getId(), startDate,endDate);
         long newFriendsCount = friendRepository.countNewFriends(userEntity.getId(), startDate,endDate);
-        long likesCount = likeRepository.countByUserIdAndCreatedAtBetween(userEntity.getId(), startDate,endDate);
-        long commentsCount = commentRepository.countByUserIdAndCreatedAtBetween(userEntity.getId(), startDate,endDate);
+        long likesCount = likeRepository.countLikesForAllPostsOfUserInLastWeek(userEntity.getId(), startDate,endDate);
+        long commentsCount = commentRepository.countCommentForAllPostsOfUserInLastWeek(userEntity.getId(), startDate,endDate);
 
         // Tạo workbook và sheet
         Workbook workbook = new XSSFWorkbook();

@@ -15,12 +15,11 @@ import java.util.List;
 public interface PostRepository extends JpaRepository<PostEntity, Long> {
     @Query("SELECT p FROM PostEntity p " +
             "JOIN p.user u " +
-            "JOIN FriendEntity f ON (f.sender = u OR f.receiver = u) " +
-            "WHERE (((f.sender.id = :userId OR f.receiver.id = :userId) " +
-            "AND f.status = 'ACCEPTED') " +
-            "OR u.id = :userId )" +
-            "AND p.status='PUBLIC'")
+            "LEFT JOIN FriendEntity f ON (f.sender = u OR f.receiver = u AND f.status = 'ACCEPTED') " +
+            "WHERE ((f.sender.id = :userId OR f.receiver.id = :userId) OR u.id = :userId) " +
+            "AND p.status = 'PUBLIC'")
     Page<PostEntity> findPostOfFriend(Long userId, Pageable pageable);
+
 
     Page<PostEntity> findByUserId(Long userId,Pageable pageable);
 

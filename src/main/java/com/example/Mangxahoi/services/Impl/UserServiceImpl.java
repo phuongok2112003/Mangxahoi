@@ -38,6 +38,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.Mangxahoi.constans.ErrorCodes.ENTITY_NOT_FOUND;
@@ -84,11 +85,34 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     @Override
     public String delete(Long id) {
+
         UserEntity entity = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
-        entity.setActive(false);
-        userRepository.save(entity);
-        return MessageCodes.PROCESSED_SUCCESSFULLY;
+        UserEntity checkUser=SecurityUtils.getCurrentUser();
+        if(!Objects.equals(checkUser.getEmail(), entity.getEmail())){
+            throw new EOException(CommonStatus.FORBIDDEN);
+        }
+        else{
+            userRepository.delete(entity);
+            return MessageCodes.PROCESSED_SUCCESSFULLY;
+        }
+
     }
+
+    @Override
+    public String turnOnOffSatus(Long id) {
+        UserEntity entity = userRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(UserEntity.class.getName(), "id", id.toString()));
+        UserEntity checkUser=SecurityUtils.getCurrentUser();
+        if(!Objects.equals(checkUser.getEmail(), entity.getEmail())){
+            throw new EOException(CommonStatus.FORBIDDEN);
+        }
+        else{
+
+            entity.setActive(!entity.isActive());
+            userRepository.save(entity);
+            return MessageCodes.PROCESSED_SUCCESSFULLY;
+        }
+    }
+
 
     @Override
     public TokenDto getToken(Otp otp) {

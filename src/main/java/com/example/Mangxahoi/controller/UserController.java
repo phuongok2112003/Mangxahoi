@@ -40,6 +40,11 @@ public class UserController {
 
         return  EOResponse.build(userService.update(id,userDto));
     }
+    @PutMapping("/active/{id}")
+    public  EOResponse<String>  turnOnOffActive(@PathVariable long id) {
+
+        return  EOResponse.build(userService.turnOnOffSatus(id));
+    }
 
     @PostMapping("/get-token")
     public EOResponse<TokenDto> getToken(@RequestBody Otp otp){

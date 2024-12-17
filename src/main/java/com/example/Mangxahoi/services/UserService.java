@@ -16,6 +16,7 @@ public interface UserService {
     UserResponseDto register(UserRequest dto);
     UserResponseDto update(@NonNull Long id, UserRequest dto);
     String delete(Long id);
+    String turnOnOffSatus(Long id);
     TokenDto getToken(Otp otp);
     UserResponseDto getUser();
     EmailResponse sendPasswordResetCode(String email);
